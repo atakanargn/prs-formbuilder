@@ -1,0 +1,56 @@
+* {
+    font-family: 'Roboto', sans-serif !important;
+}
+
+.component{
+    border:1px dashed #414141;
+    border-radius:8px;
+}
+
+.component-edit{
+    border-left:1px dashed #000;
+    border-right:1px dashed #000;
+}
+
+.component:hover{
+    border:1px dashed #000;
+    background-color:#AAA;
+    border-radius:8px;
+}
+
+.add-button{
+    border:1px dashed #000;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    font-size:12px;
+    text-align:center;
+    margin:0;
+    padding:0;
+}
+
+.add-button-first{
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.add-button-middle{
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.add-button-last{
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+.component-edit:hover{
+    background-color: #AAA;
+}

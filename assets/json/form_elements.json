@@ -1,0 +1,61 @@
+{
+    "boolean":{
+        "type":"boolean",
+        "name":"Boolean",
+        "template":"",
+        "options":[
+            "Evet",
+            "Hayır"
+        ],
+        "setup":[
+            "var template = document.createElement('select'); ",
+            "var options = ['Evet', 'Hayır']; ",
+            "options.forEach(function(optionText) { ",
+            "var option = document.createElement('option'); ",
+            "option.text = optionText; ",
+            "template.add(option); ",
+        "});"
+        ],
+        "min":false,
+        "max":false,
+        "placeholder":false,
+        "multiple":false,
+        "endpoint":false,
+        "width":true
+    },
+    "textarea":{
+        "type":"textarea",
+        "template":"<textarea class=\"form-control\"></textarea>",
+        "min":false,
+        "max":false,
+        "placeholder":true,
+        "options":false,
+        "endpoint":false,
+        "width":true
+    },
+    "text":{
+        "type":"text",
+        "template":"<input class=\"form-control\" />",
+        "min":false,
+        "max":false,
+        "placeholder":true,
+        "options":false,
+        "endpoint":false,
+        "width":true
+    },
+    "select":{
+        "type":"select",
+        "template":"<select class=\"form-select\"></select>",
+        "min":false,
+        "max":false,
+        "placeholder":true,
+        "multiple":true,
+        "options":[
+            "Seçim 1",
+            "Seçim 2",
+            "Seçim 3"
+        ],
+        "endpoint":true,
+        "width":true
+    }
+}

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fedora - Form Builder</title>
+    <link rel="stylesheet" href="./assets/css/bootstrap.css" />
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/css/custom.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,900;1,300;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-light">
+      <div class="container-fluid row">
+        <div class="col-6">
+          <span
+            class="navbar-brand"
+            style="font-weight: bolder; font-size: 28px"
+          >
+            <img
+              src="./assets/img/logo.png"
+              width="196"
+              class="d-inline-block align-text-top"
+            />
+            / <span class="text-danger">Form düzenleyici</span>
+          </span>
+        </div>
+        <div class="col-6" style="text-align: right">
+          <img
+            src="./assets/img/atmpoint.png"
+            width="148"
+            class="d-inline-block align-text-top"
+          />
+          <a href="https://atm.iyi.im/atm/index.php">
+            <button class="btn btn-danger float-right">
+              << Düzenleyiciyi kapat
+            </button>
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="row">
+      <div class="col-6 container-fluid">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="home-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#home"
+              type="button"
+              role="tab"
+              aria-controls="home"
+              aria-selected="true"
+            >
+              Ekle
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="profile-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#profile"
+              type="button"
+              role="tab"
+              aria-controls="profile"
+              aria-selected="false"
+            >
+              Düzenle
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="contact-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#contact"
+              type="button"
+              role="tab"
+              aria-controls="contact"
+              aria-selected="false"
+            >
+              Form Özellikleri
+            </button>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div
+            class="tab-pane fade show active"
+            id="home"
+            role="tabpanel"
+            aria-labelledby="home-tab"
+          >
+            <div class="container-fluid">
+
+              <div class="row">
+                <div class="col m-1">
+                    Aşağıdaki form elemanlarını önizleme alanına sürükleyerek formunuza ekleyebilirsiniz'
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col component m-1">
+                  <div class="form-group mt-2 mb-2 p-0">
+                    <label for="input-boolean" class="form-label" >
+                        <img src="./assets/img/dragdrop.svg" width="16"
+                        id="component-boolean"
+                        draggable="true" ondragstart="dragElement(event)"
+                        /> Boolean
+                    </label>
+                    <select class="form-select" id="input-boolean">
+                      <option>Evet</option>
+                      <option>Hayır</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col component m-1">
+                  <div class="form-group mt-2 mb-2 p-0">
+                    <label for="input-textarea" class="form-label" >
+                        <img src="./assets/img/dragdrop.svg" width="16"
+                        id="component-textarea"
+                        draggable="true" ondragstart="dragElement(event)"
+                        /> TextArea
+                    </label>
+                    <textarea class="form-control" id="input-textarea" rows="2"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col component m-1">
+                  <div class="form-group mt-2 mb-2 p-0">
+                    <label for="input-text" class="form-label" >
+                        <img src="./assets/img/dragdrop.svg" width="16"
+                        id="component-text"
+                        draggable="true" ondragstart="dragElement(event)"
+                        /> Metin Girdisi  
+                    </label>
+                    <input type="text" class="form-control" id="input-text" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col component m-1">
+                  <div class="form-group mt-2 mb-2 p-0">
+                    <label for="input-select" class="form-label" >
+                        <img src="./assets/img/dragdrop.svg" width="16"
+                        id="component-select"
+                        draggable="true" ondragstart="dragElement(event)"
+                        /> Seçim
+                    </label>
+                    <select id="input-select" class="form-select">
+                      <option>Seçim 1</option>
+                      <option>Seçim 2</option>
+                      <option>Seçim 3</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+
+
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="profile"
+            role="tabpanel"
+            aria-labelledby="profile-tab"
+          >
+            Düzenle
+          </div>
+          <div
+            class="tab-pane fade"
+            id="contact"
+            role="tabpanel"
+            aria-labelledby="contact-tab"
+          >
+            Form Özellikleri
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 container-fluid">
+        <ul class="nav nav-tabs" id="preview" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="preview-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#preview"
+              type="button"
+              role="tab"
+              aria-controls="preview"
+              aria-selected="true"
+            >
+              Önizleme
+            </button>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div
+            class="tab-pane fade show active"
+            id="preview"
+            role="tabpanel"
+            aria-labelledby="preview-tab"
+          >
+          <div class="container">
+            <div class="row" id="preview-form">
+                <div class="col"
+                id="preview-first"
+                ondrop="dropElement(event)"
+                ondragover="dragOver(event,this.id)"
+                ondragleave="dragLeave(this.id)">
+                    Form elemanlarını bu alana sürükleyin
+                </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/js/bootstrap.bundle.js"></script>
+    <script src="./assets/js/bootstrap.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/form_builder.js"></script>
+  </body>
+</html>
