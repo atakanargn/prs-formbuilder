@@ -54,3 +54,10 @@
 .component-edit:hover{
     background-color: #AAA;
 }
+
+.preview_form{
+    border:1px dashed #414141;
+    background-color: #DDD;
+    text-align: center;
+    justify-content: center;
+}

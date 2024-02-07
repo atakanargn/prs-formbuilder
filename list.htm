@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fedora - Form Builder</title>
+    <link rel="stylesheet" href="./assets/css/bootstrap.css" />
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/css/custom.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,900;1,300;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-light navbar-expand-lg">
+      <div class="container-fluid">
+        
+          <span
+            class="navbar-brand"
+            style="font-weight: bolder; font-size: 28px"
+          >
+            <img
+              src="./assets/img/icon.png"
+              height="42"
+              class="d-inline-block align-text-top"
+            />
+          </span>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarMenu">
+            <ul class="navbar-nav me-auto">
+
+              <li class="nav-item">
+                <a class="nav-link active" href="list.htm">Formlar
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href="elements.htm">Form elemanları
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href="settings.htm">Ayarlar
+                </a>
+              </li>
+              
+              </ul>
+            </div>
+
+            <img
+            src="./assets/img/atmpoint_icon.png"
+            height="42"
+            class="d-inline-block align-text-top"
+          />
+        </div>
+         
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 p-2 m-2">
+                <div class="row p-2">
+                    <div class="col-6 border p-4">
+                        <legend style="font-weight:bolder;">Kayıtlı Formlar</legend>
+                        <table class="table table-hover">
+                            <thead>
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">No</th>
+                                <th scope="col">Form adı</th>
+                                <th scope="col">Aksiyon</th>
+                                <th scope="col">Yetki</th>
+                                <th scope="col">İşlem</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr class="table-active">
+                                <td style="text-align:center;">
+                                        <input type="radio" value="form_id" id="form_id" />
+                                </td>
+                                <td>1</th>
+                                <td>Test formu</td>
+                                <td>Insert</td>
+                                <td>1,2,3,4</td>
+                                <td>
+                                    <a href="#edit" style="font-weight:bolder;">
+                                        Düzenle
+                                    </button>
+                                </td>
+                              </tr>
+
+                              </tbody>
+                              </table>
+                    </div>
+                    <div class="col-6    border p-4">
+                        <legend style="font-weight:bolder;">Önizleme</legend>
+                        <div id="preview_form">
+                            <div class="container preview_form" style="text-align:center;">
+                                -- Sol panelden seçtiğiniz form burada önizlenecektir. --
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script src="./assets/js/bootstrap.bundle.js"></script>
+    <script src="./assets/js/bootstrap.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/form_builder.js"></script>
+  </body>
+</html>

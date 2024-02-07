@@ -174,7 +174,6 @@ function renderForm() {
         let compRegex = /component-edit-(\d+)/;
         preview_form[i] = preview_form[i].replace(buttonRegex, `button-${i}`);
         preview_form[i] = preview_form[i].replace(compRegex, `component-edit-${i}`);
-        console.log(selected, i)
         if (selected == i)
             selected_ok = true;
     }

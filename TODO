@@ -1,0 +1,6 @@
+* form_elements JSON için dinamik render sistemi.
+* Her eleman için özel ayarlar, ortak ayarlarda mevcut.
+* Custom JS, CSS ekleyebilme.
+* Interaktif elemanlar sekmesi.
+* Drag&drop mekanizması daha dinamik hale gelecek.
+* PureJS kütüphanesi olarak kullanılabilir hale getirilecek.

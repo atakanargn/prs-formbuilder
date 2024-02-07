@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fedora - Form Builder</title>
+    <link rel="stylesheet" href="./assets/css/bootstrap.css" />
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/css/custom.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,900;1,300;1,400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-light navbar-expand-lg">
+      <div class="container-fluid">
+        <span class="navbar-brand" style="font-weight: bolder; font-size: 28px">
+          <img
+            src="./assets/img/icon.png"
+            height="42"
+            class="d-inline-block align-text-top"
+          />
+        </span>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarMenu"
+          aria-controls="navbarMenu"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMenu">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="list.htm">Formlar </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="elements.htm">Form elemanları </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="settings.htm">Ayarlar </a>
+            </li>
+          </ul>
+        </div>
+
+        <img
+          src="./assets/img/atmpoint_icon.png"
+          height="42"
+          class="d-inline-block align-text-top"
+        />
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row p-2 m-2">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-6 form-group row">
+              <label for="form_element_name" class="col-2 form-label mt-2"
+                >Element</label
+              >
+              <div class="col-10">
+                <select
+                  id="form_element_name"
+                  class="form-select"
+                  onchange="selectType(this.value,'element')"
+                >
+                  <option value="-1" selected>-- Element Seçin --</option>
+                  <option value="input">input</option>
+                  <option value="select">select</option>
+                  <option value="button">button</option>
+                  <option value="html">html</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-6 form-group row">
+              <label for="form_element_type" class="col-1 form-label mt-2"
+                >Tip</label
+              >
+              <div class="col-11">
+                <select
+                  id="form_element_type"
+                  class="form-select"
+                  onchange="selectType(this.value,'type')"
+                  disabled=""
+                >
+                  <option value="-1">-- Element seçin --</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group col-3">
+              <label for="element_name" class="form-label mt-4"> Adı </label>
+              <input type="text" class="form-control" id="element_name" />
+            </div>
+            <div class="form-group col-3">
+              <label for="element_name" class="form-label mt-4"> ID </label>
+              <input
+                type="text"
+                class="form-control"
+                id="element_name"
+                placeholder="örnek: 'boolean', 'textarea', 'text'"
+              />
+            </div>
+          </div>
+
+          <hr />
+        </div>
+        <div class="col-12">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <a
+                class="nav-link active"
+                data-bs-toggle="tab"
+                href="#template"
+                aria-selected="true"
+                role="tab"
+                >Şablon</a
+              >
+            </li>
+            <li class="nav-item" role="presentation">
+              <a
+                class="nav-link"
+                data-bs-toggle="tab"
+                aria-selected="false"
+                href="#css"
+                tabindex="-1"
+                role="tab"
+                >CSS</a
+              >
+            </li>
+            <li class="nav-item" role="presentation">
+                <a
+                  class="nav-link"
+                  data-bs-toggle="tab"
+                  aria-selected="false"
+                  href="#js"
+                  tabindex="-1"
+                  role="tab"
+                  >JS</a
+                >
+              </li>
+          </ul>
+          <div id="myTabContent" class="tab-content">
+            <div
+              class="tab-pane fade show active"
+              id="template"
+              role="tabpanel"
+            >
+              <div class="container-fluid m-1 p-2">
+                <div class="template_usable">
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{id}}');">
+                        Element ID : {{id}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{label}}');">
+                        Etiket : {{label}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{value}}');">
+                        Varsayılan : {{value}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{required}}');">
+                        Zorunlu : {{required}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{class}}');">
+                        Class : {{class}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{placeholder}}');">
+                        Placeholder : {{placeholder}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{checked}}');">
+                        Checked : {{checked}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{min}}');">
+                        Min : {{min}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{max}}');">
+                        Max : {{max}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{width}}');">
+                        Width : {{width}}
+                    </button>
+                    <button type="button" class="btn btn-primary m-1" onclick="addToTemplate('{{attr}}');">
+                        Attr : {{attr}}
+                    </button>
+                </div>
+                <textarea
+                  id="element_template"
+                  class="form-control"
+                  rows="4"
+                  onkeyup="renderTemplate();"
+                  onmousemove="templateCursorPos(this);"
+                  onmouseover="templateCursorPos(this);"
+                  onmouseleave="templateCursorPos(this);"
+                  onmouseenter="templateCursorPos(this);"
+                ></textarea>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="css" role="tabpanel">
+                <textarea
+                  id="element_template_css"
+                  class="form-control"
+                  rows="4"
+                  onkeyup="renderTemplate();"
+                ></textarea>
+            </div>
+            <div class="tab-pane fade" id="js" role="tabpanel">
+                <textarea
+                  id="element_template_js"
+                  class="form-control"
+                  rows="4"
+                  onkeyup="renderTemplate();"
+                ></textarea>
+            </div>
+          </div>
+          <div class="col-12">
+            <hr />
+            <legend>Önizleme</legend>
+            <div class="container-fluid m-3 p-3">
+                <iframe srcdoc="" id="element_preview" frameborder="0"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/js/bootstrap.bundle.js"></script>
+    <script src="./assets/js/bootstrap.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/elements.js"></script>
+  </body>
+</html>
