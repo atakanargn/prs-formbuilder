@@ -1,0 +1,22 @@
+[
+    {
+        "text":"Türkiye",
+        "value":"TR",
+        "image":"https://flagsapi.com/TR/flat/32.png"
+    },
+    {
+        "text":"Amerika",
+        "value":"US",
+        "image":"https://flagsapi.com/US/flat/32.png"
+    },
+    {
+        "text":"Brezilya",
+        "value":"BR",
+        "image":"https://flagsapi.com/BR/flat/32.png"
+    },
+    {
+        "text":"Rusya",
+        "value":"RU",
+        "image":"https://flagsapi.com/RU/flat/32.png"
+    }
+]

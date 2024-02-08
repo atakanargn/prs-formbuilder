@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fedora Select</title>
+  </head>
+  <body>
+    <select id="select_test">
+      <option value="Eski">Option 1</option>
+    </select>
+    <script src="./assets/js/element/fedora-simple-select.js"></script>
+    <script>
+      const settings = {
+        search:true,
+        placeholder:"-- SEÇİN --",
+        width:"300px",
+        data_url:"./test.json"
+      };
+
+      const fedoraSimpleSelect = new FedoraSelect("#select_test",settings);
+
+      const multi_options = [
+        { text: "Test", value: "Val test", image: "" },
+        { text: "Fedora", value: "Fed test", image: "./assets/img/icon.png" },
+        {
+          text: "AtmPoint",
+          value: "test atm",
+          image: "./assets/img/atmpoint_icon.png",
+        },
+      ];
+
+      // Add multiple
+      fedoraSimpleSelect.add(multi_options);
+
+      // Add one
+      fedoraSimpleSelect.add({
+        text: "Atakan",
+        value: "Ati",
+        image: "https://avatars.githubusercontent.com/u/12297738?v=4",
+      });
+    </script>
+  </body>
+</html>

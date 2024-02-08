@@ -42,3 +42,11 @@ function getCursorPos(input) {
   }
   return -1;
 }
+
+function showElement(id){
+  document.getElementById(id).style.display = '';
+}
+
+function hideElement(id){
+  document.getElementById(id).style.display = 'none';
+}

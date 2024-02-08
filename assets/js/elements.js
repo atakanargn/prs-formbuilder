@@ -2,10 +2,25 @@ let select_type = document.getElementById("form_element_type");
 let select_element = document.getElementById("form_element_name");
 var latestPos = -1;
 
+let TEMPLATE_VARS = [
+    {"name":"Element ID","template":"{{ID}}"},
+    {"name":"Etiket","template":"{{LABEL}}"},
+    {"name":"Varsayılan","template":"{{VALUE}}"},
+    {"name":"Zorunlu","template":"{{REQUIRED}}"},
+    {"name":"Class","template":"{{CLASS}}"},
+    {"name":"Placeholder","template":"{{PLACEHOLDER}}"},
+    {"name":"Minimum","template":"{{MIN}}"},
+    {"name":"Maximum","template":"{{MAX}}"},
+    {"name":"Genişlik","template":"{{WIDTH}}"},
+    {"name":"Attr","template":"{{ATTR}}"},
+    {"name":"Yardım Kutucuğu","template":"{{HELP_TEXT}}"}
+];
+
 document.addEventListener("DOMContentLoaded", () => {
     select_type.value = "-1";
     select_type.setAttribute("disabled", "")
     select_element.value = "-1";
+    startup();
 });
 
 function selectType(val, type) {
@@ -15,7 +30,7 @@ function selectType(val, type) {
             switch (val) {
                 case "input":
                     select_type.innerHTML = "";
-                    let options = ["-1", "checkbox", "color", "date", "datetime", "email", "file", "hidden", "number", "password", "radio", "range", "tel", "text", "time"];
+                    let options = ["-1", "checkbox", "date", "datetime", "email", "file", "hidden", "number", "password", "radio", "range", "tel", "text", "time"];
                     for (var i = 0; i < options.length; i++) {
                         var option = document.createElement('option');
                         if (options[i] == "-1") {
@@ -38,6 +53,7 @@ function selectType(val, type) {
                     select_type.add(option);
                     select_type.setAttribute("disabled", "");
                     select_type.value = "-1";
+                    startup();
                     break;
                 default:
                     select_type.innerHTML = "";
@@ -47,15 +63,25 @@ function selectType(val, type) {
                     select_type.add(option);
                     select_type.setAttribute("disabled", "");
                     select_type.value = "-1";
+                    startup();
                     break;
             }
             break;
         case "type":
             switch (val) {
                 case "checkbox":
-                    // default value : checked/unchecked
-                    // label
-                    // checkbox text
+                    showElement("first_section");
+                    showElement("fourth_section");
+                    let buttons = document.getElementById("template_usable").getElementsByTagName("button");
+                    TEMPLATE_VARS = [{"name":"Element ID","template":"{{ID}}"},
+                    {"name":"Etiket","template":"{{LABEL}}"},
+                    {"name":"Varsayılan","template":"{{VALUE}}"},
+                    {"name":"Zorunlu","template":"{{REQUIRED}}"},
+                    {"name":"Class","template":"{{CLASS}}"},
+                    {"name":"Genişlik","template":"{{WIDTH}}"},
+                    {"name":"Attr","template":"{{ATTR}}"},
+                    {"name":"Yardım Kutucuğu","template":"{{HELP_TEXT}}"}];
+                    renderVariables();
                     break;
                 case "color":
 
@@ -103,13 +129,9 @@ function selectType(val, type) {
 
 function addToTemplate(element) {
     let inputText = document.getElementById("element_template");
-    let afterText = inputText.value.substring(latestPos.start);
-    let newText = inputText.value.substring(0, latestPos.start) + element + afterText;
+    let afterText = inputText.value.substring(latestPos);
+    let newText = inputText.value.substring(0, latestPos) + element + afterText;
     inputText.value = newText;
-}
-
-function templateCursorPos(elem) {
-    latestPos = getCursorPos(elem);
 }
 
 function renderTemplate() {
@@ -127,3 +149,48 @@ function renderTemplate() {
 </html>`);
 }
 
+document.getElementById("element_template").addEventListener("input",()=>{
+    latestPos = document.getElementById("element_template").selectionStart;
+});
+
+document.getElementById("element_template").addEventListener("click",()=>{
+    latestPos = document.getElementById("element_template").selectionStart;
+});
+
+document.getElementById("element_template").addEventListener("blur",()=>{
+    latestPos = document.getElementById("element_template").selectionStart;
+});
+
+
+function renderVariables(){
+    document.getElementById("template_usable").innerHTML = "";
+
+    for(let i=0;i<TEMPLATE_VARS.length;i++){
+        document.getElementById("template_usable").innerHTML = document.getElementById("template_usable").innerHTML +
+        `<button
+        type="button"
+        class="btn btn-primary m-1"
+        onclick="addToTemplate('${TEMPLATE_VARS[i]['template']}');"
+      >
+        ${TEMPLATE_VARS[i]['name']}<br/>${TEMPLATE_VARS[i]['template']}
+      </button>`;
+    }
+}
+
+function validationState(elem){
+    let state = document.getElementById("validation_checkbox").checked;
+    if(state){
+        document.getElementById("validation_regex").removeAttribute("disabled");
+        document.getElementById("validation_message").removeAttribute("disabled");
+    }else{
+        document.getElementById("validation_regex").setAttribute("disabled","");
+        document.getElementById("validation_message").setAttribute("disabled","");
+    }
+}
+
+function startup(){
+    let sections = ["first_section", "second_section", "third_section", "fourth_section"]
+    sections.forEach(elem=>{
+        hideElement(elem);
+    });
+}

@@ -61,3 +61,13 @@
     text-align: center;
     justify-content: center;
 }
+
+.template_usable > button{
+    font-size:12px !important;
+    justify-content: space-between !important;
+}
+
+.template_usable{
+    display: flex !important;
+    justify-content: space-between !important;
+}
