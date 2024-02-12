@@ -1,0 +1,16 @@
+.fedora-form-builder-container {
+    display:flex;
+    width:100%;
+    border:1px solid;
+}
+
+.fedora-form-builder-container > div {
+    padding:16px;
+    margin:8px;
+    width:100%;
+    border:1px solid;
+}
+
+.fedora-form-builder-elements{
+    
+}

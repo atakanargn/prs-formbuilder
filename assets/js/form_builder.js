@@ -1,82 +1,5 @@
-let form_elements = {
-    "boolean": {
-        "type": "boolean",
-        "template": `<div
-        class="form-group component-edit pt-1 pb-2"
-        id="component-edit-0"
-        type="boolean"
-        onclick="selectComponent(this.id);">
-        <label class="form-label" >
-            Boolean
-        </label>
-        <select class="form-select">
-          <option>Evet</option>
-          <option>Hayır</option>
-        </select>
-      </div>`
-    },
-    "textarea": {
-        "type": "textarea",
-        "template": `<div
-        class="form-group component-edit pt-1 pb-2"
-        id="component-edit-0"
-        type="textarea"
-        onclick="selectComponent(this.id);">
-        <label for="input-textarea" class="form-label" >
-            TextArea
-        </label>
-        <textarea class="form-control" id="input-textarea" rows="2"></textarea>
-      </div>`
-    },
-    "text": {
-        "type": "text",
-        "template": `<div
-        class="form-group component-edit pt-1 pb-2"
-        id="component-edit-0"
-        type="text"
-        onclick="selectComponent(this.id);">
-        <label for="input-text" class="form-label" >
-            Metin Girdisi
-        </label>
-        <input type="text" class="form-control" id="input-text" />
-      </div>`
-    },
-    "select": {
-        "type": "select",
-        "template": `<div
-        class="form-group component-edit pt-1 pb-2"
-        id="component-edit-0"
-        type="select"
-        onclick="selectComponent(this.id);">
-        <label for="input-select" class="form-label" >
-            <img src="./assets/img/dragdrop.svg" width="16"
-            id="component-select"
-            draggable="true" ondragstart="dragElement(event)"
-            /> Seçim
-        </label>
-        <select id="input-select" class="form-select">
-          <option>Seçim 1</option>
-          <option>Seçim 2</option>
-          <option>Seçim 3</option>
-        </select>
-      </div>`,
-
-    }
-};
-
-let form_elements_;
-var xhr = new XMLHttpRequest();
-xhr.open('GET', "/assets/json/form_elements.json", true);
-xhr.responseType = 'json';
-xhr.onload = function () {
-    var status = xhr.status;
-    if (status === 200) {
-        form_elements_ = xhr.response;
-    } else {
-        form_elements_ = false;
-    }
-};
-xhr.send();
+var form_elements;
+get_form_elements("./assets/json/form_elements.json");
 
 let preview_form = [addButtonGenerator(0, "first")];
 
@@ -86,6 +9,94 @@ let holder;
 let preview = false;
 let order, status;
 let selected = null;
+
+let test = {
+    "boolean": {
+      "type": "boolean",
+      "builder_template": `<div class="row">
+      <div class="col component m-1">
+        <div class="form-group mt-2 mb-2 p-0">
+          <label for="input-boolean" class="form-label" >
+              <img src="./assets/img/dragdrop.svg" width="16"
+              id="component-boolean"
+              draggable="true" ondragstart="dragElement(event)"
+              /> Boolean
+          </label>
+          <select class="form-select" id="input-boolean">
+            <option>Evet</option>
+            <option>Hayır</option>
+          </select>
+        </div>
+      </div>
+    </div>`
+    },
+    "textarea": {
+      "type": "textarea",
+      "builder_template": `<div class="row">
+      <div class="col component m-1">
+        <div class="form-group mt-2 mb-2 p-0">
+          <label for="input-textarea" class="form-label" >
+              <img src="./assets/img/dragdrop.svg" width="16"
+              id="component-textarea"
+              draggable="true" ondragstart="dragElement(event)"
+              /> TextArea
+          </label>
+          <textarea class="form-control" id="input-textarea" rows="2"></textarea>
+        </div>
+      </div>
+    </div>`,
+    "preview_template":`<div class="component-edit m-1">
+      <div class="form-group mt-2 mb-2 p-0">
+        <label for="input-textarea" class="form-label" >
+            <img src="./assets/img/dragdrop.svg" width="16"
+            id="component-textarea"
+            draggable="true" ondragstart="dragElement(event)"
+            /> TextArea
+        </label>
+        <textarea class="form-control" id="input-textarea" rows="2"></textarea>
+      </div>
+    </div>`
+    },
+    "text": {
+      "type": "text",
+      "builder_template": `<div class="row">
+      <div class="col component m-1">
+        <div class="form-group mt-2 mb-2 p-0">
+          <img src="./assets/img/dragdrop.svg" width="16"
+              id="component-text"
+              draggable="true" ondragstart="dragElement(event)"
+              />
+          <label for="input-text" class="form-label" >
+               Metin Girdisi  
+          </label>
+          <input type="text" class="form-control" id="input-text" />
+        </div>
+      </div>
+    </div>`
+    },
+    "select": {
+      "type": "select",
+      "builder_template": `<div class="row">
+      <div class="col component m-1">
+        <div class="form-group mt-2 mb-2 p-0">
+          <label for="input-select" class="form-label" >
+              <img src="./assets/img/dragdrop.svg" width="16"
+              id="component-select"
+              draggable="true" ondragstart="dragElement(event)"
+              /> Seçim
+          </label>
+          <select id="input-select" class="form-select">
+            <option>Seçim 1</option>
+            <option>Seçim 2</option>
+            <option>Seçim 3</option>
+          </select>
+        </div>
+      </div>
+    </div>`
+    }
+  }
+  
+  
 
 renderForm();
 
@@ -108,20 +119,6 @@ function addButtonGenerator(id, position) {
     </div>`;
 }
 
-function formElementRender(type) {
-    eval(form_elements_[type]["setup"].join(""));
-    return `<div
-    class="form-group component-edit pt-1 pb-2"
-    id="component-edit-0"
-    type="boolean"
-    onclick="selectComponent(this.id);">
-    <label class="form-label" >
-        Boolean
-    </label>
-    ${template.outerHTML}
-    </div>`;
-}
-
 function dropElement(event) {
     event.preventDefault();
     document.getElementById("preview-form").classList.remove("bg-secondary");
@@ -133,14 +130,14 @@ function dropElement(event) {
                 preview_form.splice(order + 1, 0, addButtonGenerator(preview_form.length, "middle"));
             }
 
-            preview_form.splice(order + 1, 0, form_elements[holder]["template"]);
+            preview_form.splice(order + 1, 0, form_elements[holder]["preview_template"]);
             break;
         case "middle":
-            preview_form.splice(order, 0, form_elements[holder]["template"]);
+            preview_form.splice(order, 0, form_elements[holder]["preview_template"]);
             preview_form.splice(order, 0, addButtonGenerator(preview_form.length, "middle"));
             break;
         case "last":
-            preview_form.splice(order, 0, form_elements[holder]["template"]);
+            preview_form.splice(order, 0, form_elements[holder]["preview_template"]);
             preview_form.splice(order, 0, addButtonGenerator(preview_form.length, "middle"));
 
             break;
@@ -155,7 +152,7 @@ function dragOver(event, id) {
     if (preview) return;
     status = document.getElementById(event.target.id).getAttribute("status");
     order = event.target.id.split("-")[1];
-    document.getElementById(id).innerHTML = form_elements[holder]["template"];
+    document.getElementById(id).innerHTML = form_elements[holder]["preview_template"];
     document.getElementById(id).classList.remove("add-button");
     preview = true;
 }
@@ -194,4 +191,26 @@ function selectComponent(id) {
     selected = id.split("-")[2];
 
     renderForm();
+}
+
+function get_form_elements(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function () {
+        var status = xhr.status;
+        if (status === 200) {
+            form_elements = xhr.response;
+            render_form_elements();
+        } else {
+            form_elements = false;
+        }
+    };
+    xhr.send();
+}
+
+function render_form_elements() {
+    Object.keys(form_elements).forEach(key => {
+        document.getElementById("form_elements").innerHTML = document.getElementById("form_elements").innerHTML + `${form_elements[key]['builder_template']}`
+    });
 }

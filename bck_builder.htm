@@ -120,11 +120,74 @@
             role="tabpanel"
             aria-labelledby="home-tab"
           >
-            <div class="container-fluid"  id="form_elements">
+            <div class="container-fluid">
 
               <div class="row">
                 <div class="col m-1">
                     Aşağıdaki form elemanlarını önizleme alanına sürükleyerek formunuza ekleyebilirsiniz'
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col component m-1">
+                  <div class="form-group mt-2 mb-2 p-0">
+                    <label for="input-boolean" class="form-label" >
+                        <img src="./assets/img/dragdrop.svg" width="16"
+                        id="component-boolean"
+                        draggable="true" ondragstart="dragElement(event)"
+                        /> Boolean
+                    </label>
+                    <select class="form-select" id="input-boolean">
+                      <option>Evet</option>
+                      <option>Hayır</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col component m-1">
+                  <div class="form-group mt-2 mb-2 p-0">
+                    <label for="input-textarea" class="form-label" >
+                        <img src="./assets/img/dragdrop.svg" width="16"
+                        id="component-textarea"
+                        draggable="true" ondragstart="dragElement(event)"
+                        /> TextArea
+                    </label>
+                    <textarea class="form-control" id="input-textarea" rows="2"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col component m-1">
+                  <div class="form-group mt-2 mb-2 p-0">
+                    <label for="input-text" class="form-label" >
+                        <img src="./assets/img/dragdrop.svg" width="16"
+                        id="component-text"
+                        draggable="true" ondragstart="dragElement(event)"
+                        /> Metin Girdisi  
+                    </label>
+                    <input type="text" class="form-control" id="input-text" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col component m-1">
+                  <div class="form-group mt-2 mb-2 p-0">
+                    <label for="input-select" class="form-label" >
+                        <img src="./assets/img/dragdrop.svg" width="16"
+                        id="component-select"
+                        draggable="true" ondragstart="dragElement(event)"
+                        /> Seçim
+                    </label>
+                    <select id="input-select" class="form-select">
+                      <option>Seçim 1</option>
+                      <option>Seçim 2</option>
+                      <option>Seçim 3</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 

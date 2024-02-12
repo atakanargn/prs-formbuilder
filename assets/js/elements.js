@@ -3,24 +3,22 @@ let select_element = document.getElementById("form_element_name");
 var latestPos = -1;
 
 let TEMPLATE_VARS = [
-    {"name":"Element ID","template":"{{ID}}"},
-    {"name":"Etiket","template":"{{LABEL}}"},
-    {"name":"Varsayılan","template":"{{VALUE}}"},
-    {"name":"Zorunlu","template":"{{REQUIRED}}"},
-    {"name":"Class","template":"{{CLASS}}"},
-    {"name":"Placeholder","template":"{{PLACEHOLDER}}"},
-    {"name":"Minimum","template":"{{MIN}}"},
-    {"name":"Maximum","template":"{{MAX}}"},
-    {"name":"Genişlik","template":"{{WIDTH}}"},
-    {"name":"Attr","template":"{{ATTR}}"},
-    {"name":"Yardım Kutucuğu","template":"{{HELP_TEXT}}"}
+    { "name": "Element ID", "template": "{{ID}}" },
+    { "name": "Etiket", "template": "{{LABEL}}" },
+    { "name": "Varsayılan", "template": "{{VALUE}}" },
+    { "name": "Placeholder", "template": "{{PLACEHOLDER}}" },
+    { "name": "Minimum", "template": "{{MIN}}" },
+    { "name": "Maximum", "template": "{{MAX}}" },
+    { "name": "Genişlik", "template": "{{WIDTH}}" },
+    { "name": "Attr", "template": "{{ATTR}}" },
+    { "name": "Yardım Kutucuğu", "template": "{{HELP_TEXT}}" }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
     select_type.value = "-1";
     select_type.setAttribute("disabled", "")
     select_element.value = "-1";
-    startup();
+    // startup();
 });
 
 function selectType(val, type) {
@@ -30,7 +28,12 @@ function selectType(val, type) {
             switch (val) {
                 case "input":
                     select_type.innerHTML = "";
-                    let options = ["-1", "checkbox", "date", "datetime", "email", "file", "hidden", "number", "password", "radio", "range", "tel", "text", "time"];
+                    let options = ["-1",
+                        "checkbox",
+                        "date",
+                        "datetime", "email", "file", "hidden",
+                        "number", "password", "radio", "range",
+                        "tel", "text", "time"];
                     for (var i = 0; i < options.length; i++) {
                         var option = document.createElement('option');
                         if (options[i] == "-1") {
@@ -73,14 +76,15 @@ function selectType(val, type) {
                     showElement("first_section");
                     showElement("fourth_section");
                     let buttons = document.getElementById("template_usable").getElementsByTagName("button");
-                    TEMPLATE_VARS = [{"name":"Element ID","template":"{{ID}}"},
-                    {"name":"Etiket","template":"{{LABEL}}"},
-                    {"name":"Varsayılan","template":"{{VALUE}}"},
-                    {"name":"Zorunlu","template":"{{REQUIRED}}"},
-                    {"name":"Class","template":"{{CLASS}}"},
-                    {"name":"Genişlik","template":"{{WIDTH}}"},
-                    {"name":"Attr","template":"{{ATTR}}"},
-                    {"name":"Yardım Kutucuğu","template":"{{HELP_TEXT}}"}];
+                    TEMPLATE_VARS = [
+                        { "name": "ID", "template": "{{ID}}" },
+                        { "name": "Etiket", "template": "{{LABEL}}" },
+                        { "name": "Varsayılan", "template": "{{VALUE}}" },
+                        { "name": "Class", "template": "{{CLASS}}" },
+                        { "name": "Genişlik", "template": "{{WIDTH}}" },
+                        { "name": "Attr", "template": "{{ATTR}}" },
+                        { "name": "Yardım Kutucuğu", "template": "{{HELP_TEXT}}" }
+                    ];
                     renderVariables();
                     break;
                 case "color":
@@ -149,25 +153,25 @@ function renderTemplate() {
 </html>`);
 }
 
-document.getElementById("element_template").addEventListener("input",()=>{
+document.getElementById("element_template").addEventListener("input", () => {
     latestPos = document.getElementById("element_template").selectionStart;
 });
 
-document.getElementById("element_template").addEventListener("click",()=>{
+document.getElementById("element_template").addEventListener("click", () => {
     latestPos = document.getElementById("element_template").selectionStart;
 });
 
-document.getElementById("element_template").addEventListener("blur",()=>{
+document.getElementById("element_template").addEventListener("blur", () => {
     latestPos = document.getElementById("element_template").selectionStart;
 });
 
 
-function renderVariables(){
+function renderVariables() {
     document.getElementById("template_usable").innerHTML = "";
 
-    for(let i=0;i<TEMPLATE_VARS.length;i++){
+    for (let i = 0; i < TEMPLATE_VARS.length; i++) {
         document.getElementById("template_usable").innerHTML = document.getElementById("template_usable").innerHTML +
-        `<button
+            `<button
         type="button"
         class="btn btn-primary m-1"
         onclick="addToTemplate('${TEMPLATE_VARS[i]['template']}');"
@@ -177,20 +181,46 @@ function renderVariables(){
     }
 }
 
-function validationState(elem){
+function validationState(elem) {
     let state = document.getElementById("validation_checkbox").checked;
-    if(state){
+    if (state) {
         document.getElementById("validation_regex").removeAttribute("disabled");
         document.getElementById("validation_message").removeAttribute("disabled");
-    }else{
-        document.getElementById("validation_regex").setAttribute("disabled","");
-        document.getElementById("validation_message").setAttribute("disabled","");
+    } else {
+        document.getElementById("validation_regex").setAttribute("disabled", "");
+        document.getElementById("validation_message").setAttribute("disabled", "");
     }
 }
 
-function startup(){
+function startup() {
     let sections = ["first_section", "second_section", "third_section", "fourth_section"]
-    sections.forEach(elem=>{
+    sections.forEach(elem => {
         hideElement(elem);
     });
 }
+
+function saveElement() {
+    var form_element = {};
+    const element_id = document.getElementById("element_id").value.trim();
+
+    form_element[`${element_id.toLowerCase()}`] = {
+        base: document.getElementById("form_element_name").value,
+        type: document.getElementById("form_element_type").value,
+        name: document.getElementById("element_name").value.trim(),
+        template: document.getElementById("element_template").value,
+        css: document.getElementById("element_template_css").value,
+        js: document.getElementById("element_template_js").value,
+        validation: document.getElementById("validation_checkbox").checked ? {
+            active: document.getElementById("validation_checkbox").checked,
+            regex: document.getElementById("validation_regex").value,
+            message: document.getElementById("validation_message").value
+        } : false,
+        placeholder: document.getElementById("parameter_placeholder").checked,
+        min: document.getElementById("parameter_min").checked,
+        max: document.getElementById("parameter_max").checked,
+        multiple: document.getElementById("parameter_multiple").checked,
+        endpoint: false
+    }
+    return form_element;
+}
+

@@ -1,61 +1,85 @@
 {
-    "boolean":{
-        "type":"boolean",
-        "name":"Boolean",
-        "template":"",
-        "options":[
-            "Evet",
-            "Hayır"
-        ],
-        "setup":[
-            "var template = document.createElement('select'); ",
-            "var options = ['Evet', 'Hayır']; ",
-            "options.forEach(function(optionText) { ",
-            "var option = document.createElement('option'); ",
-            "option.text = optionText; ",
-            "template.add(option); ",
-        "});"
-        ],
-        "min":false,
-        "max":false,
-        "placeholder":false,
-        "multiple":false,
-        "endpoint":false,
-        "width":true
-    },
-    "textarea":{
-        "type":"textarea",
-        "template":"<textarea class=\"form-control\"></textarea>",
-        "min":false,
-        "max":false,
-        "placeholder":true,
-        "options":false,
-        "endpoint":false,
-        "width":true
-    },
-    "text":{
-        "type":"text",
-        "template":"<input class=\"form-control\" />",
-        "min":false,
-        "max":false,
-        "placeholder":true,
-        "options":false,
-        "endpoint":false,
-        "width":true
-    },
-    "select":{
-        "type":"select",
-        "template":"<select class=\"form-select\"></select>",
-        "min":false,
-        "max":false,
-        "placeholder":true,
-        "multiple":true,
-        "options":[
-            "Seçim 1",
-            "Seçim 2",
-            "Seçim 3"
-        ],
-        "endpoint":true,
-        "width":true
-    }
+  "boolean": {
+    "type": "boolean",
+    "builder_template": `<div class="row">
+    <div class="col component m-1">
+      <div class="form-group mt-2 mb-2 p-0">
+        <label for="input-boolean" class="form-label" >
+            <img src="./assets/img/dragdrop.svg" width="16"
+            id="component-boolean"
+            draggable="true" ondragstart="dragElement(event)"
+            /> Boolean
+        </label>
+        <select class="form-select" id="input-boolean">
+          <option>Evet</option>
+          <option>Hayır</option>
+        </select>
+      </div>
+    </div>
+  </div>`
+  },
+  "textarea": {
+    "type": "textarea",
+    "builder_template": `<div class="row">
+    <div class="col component m-1">
+      <div class="form-group mt-2 mb-2 p-0">
+        <label for="input-textarea" class="form-label" >
+            <img src="./assets/img/dragdrop.svg" width="16"
+            id="component-textarea"
+            draggable="true" ondragstart="dragElement(event)"
+            /> TextArea
+        </label>
+        <textarea class="form-control" id="input-textarea" rows="2"></textarea>
+      </div>
+    </div>
+  </div>`,
+  "preview_template":`<div class="component-edit m-1">
+    <div class="form-group mt-2 mb-2 p-0">
+      <label for="input-textarea" class="form-label" >
+          <img src="./assets/img/dragdrop.svg" width="16"
+          id="component-textarea"
+          draggable="true" ondragstart="dragElement(event)"
+          /> TextArea
+      </label>
+      <textarea class="form-control" id="input-textarea" rows="2"></textarea>
+    </div>
+  </div>`
+  },
+  "text": {
+    "type": "text",
+    "builder_template": `<div class="row">
+    <div class="col component m-1">
+      <div class="form-group mt-2 mb-2 p-0">
+        <img src="./assets/img/dragdrop.svg" width="16"
+            id="component-text"
+            draggable="true" ondragstart="dragElement(event)"
+            />
+        <label for="input-text" class="form-label" >
+             Metin Girdisi  
+        </label>
+        <input type="text" class="form-control" id="input-text" />
+      </div>
+    </div>
+  </div>`
+  },
+  "select": {
+    "type": "select",
+    "builder_template": `<div class="row">
+    <div class="col component m-1">
+      <div class="form-group mt-2 mb-2 p-0">
+        <label for="input-select" class="form-label" >
+            <img src="./assets/img/dragdrop.svg" width="16"
+            id="component-select"
+            draggable="true" ondragstart="dragElement(event)"
+            /> Seçim
+        </label>
+        <select id="input-select" class="form-select">
+          <option>Seçim 1</option>
+          <option>Seçim 2</option>
+          <option>Seçim 3</option>
+        </select>
+      </div>
+    </div>
+  </div>`
+  }
 }

@@ -8,18 +8,19 @@
 }
 
 .component-edit{
-    border-left:1px dashed #000;
-    border-right:1px dashed #000;
+    border-left:1px dashed #999;
+    border-right:1px dashed #999;
+    padding:8px;
 }
 
 .component:hover{
-    border:1px dashed #000;
+    border:1px dashed #999;
     background-color:#AAA;
     border-radius:8px;
 }
 
 .add-button{
-    border:1px dashed #000;
+    border:1px dashed #999;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
     border-bottom-left-radius: 16px;
@@ -56,7 +57,7 @@
 }
 
 .preview_form{
-    border:1px dashed #414141;
+    border:1px dashed #999;
     background-color: #DDD;
     text-align: center;
     justify-content: center;
