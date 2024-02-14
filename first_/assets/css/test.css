@@ -1,0 +1,32 @@
+.fedora-form-builder-container {
+    display:flex;
+    width:100%;
+    border:1px solid;
+}
+
+.fedora-form-builder-container h4 {
+    padding:2px;
+    margin:2px;
+    margin-left:0;
+    margin-right: 0;
+}
+
+.fedora-form-builder-container > div {
+    padding:8px;
+    margin:8px;
+    width:100%;
+    border:1px solid;
+}
+
+.fedora-form-builder-elements{
+    list-style: none;
+    padding:0;
+    margin:0;
+    
+}
+
+.fedora-form-builder-elements > li{
+    border:1px solid;
+    padding:8px;
+    margin:2px;
+}

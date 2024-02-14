@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fedora Form Builder</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/dragula.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="ffb-container">
+      <div>
+        <ul class="form-edit-tabs" id="form-tabs">
+          <li to="tab-elements">Araçlar</li>
+          <li to="tab-edit">Düzenle</li>
+          <li to="tab-general">Genel</li>
+        </ul>
+        <div class="tabs" id="tab-elements">
+          <ul class="ffb-elements" id="elements"></ul>
+        </div>
+        <div class="tabs" id="tab-edit">
+          <ul class="ffb-elements">
+            <div class="form-component" id="edit-component"></div>
+          </ul>
+        </div>
+        <div class="tabs" id="tab-general">GENERAL</div>
+      </div>
+      <div>
+        <ul class="form-edit-tabs" id="form-tabs2">
+          <li to="tab2-edit">Düzenleme</li>
+          <li to="tab2-preview">Önizleme</li>
+        </ul>
+        <div class="tabs" id="tab2-edit">
+          <ul class="ffb-elements" id="preview"></ul>
+        </div>
+        <div class="tabs" id="tab2-preview">ÖNİZLEME</div>
+      </div>
+    </div>
+
+    <script src="assets/js/dragula.js"></script>
+    <script src="assets/js/form_elements.js"></script>
+    <script src="assets/js/form-utils.js"></script>
+    <script>
+      var selected_element;
+
+      var result_form = [];
+
+      window.addEventListener("load", () => {
+        // Form elementlerini listeleme
+        Object.keys(form_elements).forEach((el) => {
+          let obj = document.createElement("li");
+          let img = document.createElement("img");
+          img.src = `/assets/img/elements/${el}.svg`;
+          obj.appendChild(img);
+          obj.innerHTML = obj.innerHTML + form_elements[el]["name"];
+          obj.id = el;
+          document.getElementById("elements").appendChild(obj);
+        });
+      });
+
+      var drake = dragula(
+        [
+          document.getElementById("elements"),
+          document.getElementById("preview"),
+        ],
+        {
+          copy: (el, source) => {
+            return source.id === "elements";
+          },
+          accepts: (el, target, source, sibling) => {
+            return target !== document.getElementById("elements");
+          },
+          removeOnSpill: true,
+        }
+      )
+        .on("drag", (element) => {
+          if (element.id.includes("-")) {
+            selectForEdit(element);
+          }
+        })
+        .on("drop", (element, target, source) => {
+          if (!element.id.includes("-")) {
+            let div = document.createElement("div");
+            div.classList.add("form-edit");
+            let uts = getUTC();
+
+            let template = form_elements[element.id]["template"].replaceAll(
+              "{{id}}",
+              uts
+            );
+
+            let element_type = element.id;
+            element.id = `${element.id}-li-${uts}`;
+            
+            element.classList.add("form-element");
+            element.style.width = "100%";
+
+            let buttons = `<button class="increase-button" id="inc-${element.id}" onclick="increaseSizeOfComponent('${element.id}',this);" disabled="">
+          +
+        </button>
+        <input type="number" class="width-input no-spin" min="20" max="100" step="10" onclick="this.select();" onblur="changeWidth('${element.id}',this);" id="width-${element.id}" value="100" />
+        <button class="decrease-button" id="dec-${element.id}" onclick="decreaseSizeOfComponent('${element.id}',this);">
+          -
+        </button>
+        <button class="cancel-button" onclick="cancelComponent('${element.id}');">
+          <img src="/assets/img/cancel.svg" />
+        </button>`;
+
+            div.innerHTML = buttons + template;
+            element.innerHTML = div.outerHTML;
+
+            element.addEventListener("click", () => {
+              selectForEdit(element);
+            });
+
+            const obj = {
+              cid:`${uts}`,
+              order:-1,
+              type:element_type,
+              width:"100%",
+              name:"",
+              label:element.getElementsByClassName("form-edit-label")[0].textContent,
+              helptext:false,
+              required:true,
+              class:"",
+              css:"",
+              condition:"Aktif",
+              
+              placeholder:"",
+              validation:false,
+              default:false,
+              endpoint:false,
+              attr:"",
+              options:false,
+              
+            }
+
+            result_form[obj['id']] = obj;
+          }
+        });
+
+      function selectForEdit(el) {
+        if (selected_element != el) {
+          const elements = document
+            .getElementById("preview")
+            .getElementsByTagName("li");
+          for (let i = 0; i < elements.length; i++) {
+            elements[i].classList.remove("select-for-edit");
+          }
+          el.classList.add("select-for-edit");
+          tabs1.change("tab-edit");
+          selected_element = el;
+          renderEditor(selected_element);
+        }
+      }
+
+      function getUTC() {
+        return `${
+          Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000
+        }${Math.floor(new Date().getTime() / 1000)}`;
+      }
+
+      // Quick action buttons
+      function cancelComponent(id) {
+        document
+          .getElementById("preview")
+          .removeChild(document.getElementById(id));
+        setTimeout(() => {
+          tabs1.change("tab-elements");
+          selected_element = null;
+        }, 2);
+      }
+
+      function increaseSizeOfComponent(id, el) {
+        let li = document.getElementById(`${id}`);
+        li.style.width =
+          li.style.width.split("%")[0] < 100
+            ? `${parseInt(li.style.width.split("%")[0]) + 10}%`
+            : li.style.width;
+        if (li.style.width == "100%") {
+          el.setAttribute("disabled", "");
+          document.getElementById(`dec-${id}`).removeAttribute("disabled");
+        }
+
+        if (li.style.width.split("%")[0] > 20) {
+          document.getElementById(`dec-${id}`).removeAttribute("disabled");
+        }
+
+        let width_input = document.getElementById(`width-${id}`);
+        width_input.value = li.style.width.replace("%", "");
+      }
+
+      function decreaseSizeOfComponent(id, el) {
+        let li = document.getElementById(`${id}`);
+        li.style.width =
+          li.style.width.split("%")[0] >= 30
+            ? `${parseInt(li.style.width.split("%")[0]) - 10}%`
+            : li.style.width;
+        if (li.style.width == "20%") {
+          el.setAttribute("disabled", "");
+          document.getElementById(`inc-${id}`).removeAttribute("disabled");
+        }
+
+        if (li.style.width.split("%")[0] < 100) {
+          document.getElementById(`inc-${id}`).removeAttribute("disabled");
+        }
+
+        let width_input = document.getElementById(`width-${id}`);
+        width_input.value = li.style.width.replace("%", "");
+      }
+
+      function changeWidth(id, el) {
+        el.value = roundToTen(el.value, 20, 100, 10);
+        let li = document.getElementById(`${id}`);
+        li.style.width = `${el.value}%`;
+      }
+
+      // Component Edit Functions
+      function addOption(id,el){
+        let new_option = new Option(el.parentNode.getElementsByTagName("input")[0].value, el.parentNode.getElementsByTagName("input")[1].value);
+
+      }
+
+      function changeRequire(id, el) {
+        if (el.checked) {
+          document.getElementById(`component-required-${id}`).style.display =
+            "block";
+        } else {
+          document.getElementById(`component-required-${id}`).style.display =
+            "none";
+        }
+      }
+
+      function changeLabel(id, el) {
+        document.getElementById(`component-label-${id}`).innerHTML = el.value;
+      }
+
+      function changeHelpText(id, el) {
+        if (el.value.trim().length != 0) {
+          document.getElementById(
+            `comp-helptext-${id}`
+          ).innerHTML = `${el.value} <a href="#" onclick="toggleHelp('${id}')">[X]</a>`;
+          document.getElementById(`helptext-button-${id}`).style.display =
+            "block";
+        } else {
+          document.getElementById(`comp-helptext-${id}`).innerHTML = "";
+          document.getElementById(`helptext-button-${id}`).style.display =
+            "none";
+        }
+      }
+
+      function toggleHelp(id) {
+        document.getElementById(`comp-helptext-${id}`).classList.toggle("show");
+      }
+
+      function changeClass(id, el) {
+        console.log(id, el);
+        document
+          .getElementById(`real-component-${id}`)
+          .setAttribute("class", el.value);
+      }
+
+      function changeCSS(id, el) {
+        document
+          .getElementById(`real-component-${id}`)
+          .removeAttribute("style");
+        document
+          .getElementById(`real-component-${id}`)
+          .setAttribute(
+            "style",
+            el.value.replaceAll("\n", "").replaceAll(" ", "")
+          );
+      }
+
+      function changeValue(id, el) {
+        document.getElementById(`real-component-${id}`).value = el.value;
+      }
+
+      function getForm() {
+        const elements = document
+          .getElementById("preview")
+          .getElementsByTagName("li");
+        for (let i = 0; i < elements.length; i++) {
+          let id = elements[i].id.split("-")[2];
+          let obj = {
+            type: elements[i].id.split("-")[0],
+            width: elements[i].style.width,
+            name: document.getElementById(`component-name-input-${id}`).value,
+            label: elements[i]
+              .getElementsByTagName("label")[0]
+              .textContent.trim(),
+            required:
+              elements[i].getElementsByClassName("comp-required")[0].style
+                .display == "block",
+            helptext:
+              elements[i].getElementsByClassName("helptext-button")[0].style
+                .display == "block"
+                ? elements[i]
+                    .getElementsByClassName("popover-content")[0]
+                    .textContent.replace(" [X]", "")
+                    .trim()
+                : false,
+            class: document
+              .getElementById(`real-component-${id}`)
+              .classList.toString(),
+            css: document.getElementById(`real-component-${id}`).style.cssText,
+            condition: document.getElementById(`component-condition-${id}`)
+              .value,
+          };
+          console.log(obj);
+        }
+      }
+
+      function renderEditor(el) {
+        document.getElementById("edit-component").innerHTML = "";
+        let editables = form_elements[el.id.split("-")[0]]["editor"];
+        for (let i = 0; i < editables.length; i++) {
+          document.getElementById("edit-component").innerHTML =
+            document.getElementById("edit-component").innerHTML +
+            `${editor_elements[editables[i]]
+              .replace("{{id}}", el.id.split("-")[2])
+              .replace(
+                "{{label}}",
+                form_elements[el.id.split("-")[0]]["name"]
+              )}`;
+        }
+      }
+
+      /*
+        var m_pos;
+        var resize_el;
+        function resize(e) {
+          var parent = resize_el.parentNode.parentNode.parentNode;
+          console.log(parent)
+          var dx = m_pos - e.x;
+          m_pos = e.x;
+          parent.style.width =
+            parseInt(getComputedStyle(parent, "").width) + dx + "px";
+        }
+
+
+          resize_el = document.getElementById("resize");
+          resize_el.addEventListener(
+            "mousedown",
+            function (e) {
+              m_pos = e.x;
+              document.addEventListener("mousemove", resize, false);
+            },
+            false
+          );
+          document.addEventListener(
+            "mouseup",
+            function () {
+              document.removeEventListener("mousemove", resize, false);
+            },
+            false
+          );
+        */
+
+      // FedoraTab library
+      class FedoraTab {
+        #tabs;
+
+        constructor(id) {
+          this.#find_and_select(id);
+        }
+
+        #find_and_select(id) {
+          this.#tabs = document.getElementById(id).getElementsByTagName("li");
+          let not_selected = true;
+          for (let i = 0; i < this.#tabs.length; i++) {
+            document.getElementById(
+              this.#tabs[i].getAttribute("to")
+            ).style.display = "none";
+            const self = this;
+            this.#tabs[i].addEventListener("click", () => {
+              self.select(this.#tabs[i]);
+            });
+            let classes = this.#tabs[i].classList;
+            for (let j = 0; j < classes.length; j++) {
+              if (classes[j] == "selected")
+                document.getElementById(
+                  this.#tabs[i].getAttribute("to")
+                ).style.display = "block";
+            }
+          }
+          if (not_selected) {
+            document.getElementById(
+              this.#tabs[0].getAttribute("to")
+            ).style.display = "block";
+            this.#tabs[0].classList.add("selected");
+          }
+        }
+
+        select(el) {
+          for (let i = 0; i < this.#tabs.length; i++) {
+            this.#tabs[i].classList.remove("selected");
+            document.getElementById(
+              this.#tabs[i].getAttribute("to")
+            ).style.display = "none";
+          }
+          el.classList.add("selected");
+          document.getElementById(el.getAttribute("to")).style.display =
+            "block";
+        }
+
+        change(tab) {
+          let el = document.getElementById(tab);
+          let selected_tab;
+          for (let i = 0; i < this.#tabs.length; i++) {
+            this.#tabs[i].classList.remove("selected");
+            document.getElementById(
+              this.#tabs[i].getAttribute("to")
+            ).style.display = "none";
+            if (this.#tabs[i].getAttribute("to") == tab)
+              selected_tab = this.#tabs[i];
+          }
+          selected_tab.classList.add("selected");
+          el.style.display = "block";
+        }
+      }
+
+      const tabs1 = new FedoraTab("form-tabs");
+      const tabs2 = new FedoraTab("form-tabs2");
+    </script>
+  </body>
+</html>

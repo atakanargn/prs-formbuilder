@@ -1,0 +1,19 @@
+{
+    "boolean": {
+      "type": "boolean",
+      "builder_template": "<div class=\"row\">\n      <div class=\"col component m-1\">\n        <div class=\"form-group mt-2 mb-2 p-0\">\n          <label for=\"input-boolean\" class=\"form-label\" >\n              <img src=\"./assets/img/dragdrop.svg\" width=\"16\"\n              id=\"component-boolean\"\n              draggable=\"true\" ondragstart=\"dragElement(event)\"\n              /> Boolean\n          </label>\n          <select class=\"form-select\" id=\"input-boolean\">\n            <option>Evet</option>\n            <option>Hayır</option>\n          </select>\n        </div>\n      </div>\n    </div>"
+    },
+    "textarea": {
+      "type": "textarea",
+      "builder_template": "<div class=\"row\">\n      <div class=\"col component m-1\">\n        <div class=\"form-group mt-2 mb-2 p-0\">\n          <label for=\"input-textarea\" class=\"form-label\" >\n              <img src=\"./assets/img/dragdrop.svg\" width=\"16\"\n              id=\"component-textarea\"\n              draggable=\"true\" ondragstart=\"dragElement(event)\"\n              /> TextArea\n          </label>\n          <textarea class=\"form-control\" id=\"input-textarea\" rows=\"2\"></textarea>\n        </div>\n      </div>\n    </div>",
+      "preview_template": "<div class=\"component-edit form-group mt-2 mb-2\">\n        <label for=\"input-textarea\" class=\"form-label\" >\n            <img src=\"./assets/img/dragdrop.svg\" width=\"16\"\n            id=\"component-textarea\"\n            draggable=\"true\" ondragstart=\"dragElement(event)\"\n            /> TextArea\n        </label>\n        <textarea class=\"form-control\" id=\"input-textarea\" rows=\"2\"></textarea>\n      </div>"
+    },
+    "text": {
+      "type": "text",
+      "builder_template": "<div class=\"row\">\n      <div class=\"col component m-1\">\n        <div class=\"form-group mt-2 mb-2 p-0\">\n          <img src=\"./assets/img/dragdrop.svg\" width=\"16\"\n              id=\"component-text\"\n              draggable=\"true\" ondragstart=\"dragElement(event)\"\n              />\n          <label for=\"input-text\" class=\"form-label\" >\n               Metin Girdisi  \n          </label>\n          <input type=\"text\" class=\"form-control\" id=\"input-text\" />\n        </div>\n      </div>\n    </div>"
+    },
+    "select": {
+      "type": "select",
+      "builder_template": "<div class=\"row\">\n      <div class=\"col component m-1\">\n        <div class=\"form-group mt-2 mb-2 p-0\">\n          <label for=\"input-select\" class=\"form-label\" >\n              <img src=\"./assets/img/dragdrop.svg\" width=\"16\"\n              id=\"component-select\"\n              draggable=\"true\" ondragstart=\"dragElement(event)\"\n              /> Seçim\n          </label>\n          <select id=\"input-select\" class=\"form-select\">\n            <option>Seçim 1</option>\n            <option>Seçim 2</option>\n            <option>Seçim 3</option>\n          </select>\n        </div>\n      </div>\n    </div>"
+    }
+  }
