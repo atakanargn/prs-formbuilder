@@ -397,7 +397,7 @@ const editor_elements = {
       <label>
           Varsayılan
       </label>
-      <input oninput="changeValue('{{id}}',this);" type="text" />
+      <input oninput="changeDefault('{{id}}',this);" type="text" />
     </div>
     `,
     "select-options": `

@@ -412,7 +412,6 @@
         let width_input = document.getElementById(`width-${id}`);
         width_input.value = li.style.width.replace("%", "");
         // TODO : Width güncellemesi editable alanındaki input için de yapılacak.
-
       }
 
       // TODO Min func
@@ -516,9 +515,9 @@
             // data-hint attribute'ünü güncelliyoruz
             // hint.js kütüphanesi data-hint özelliği olan objeler
             // hint box özelliğini otomatik olarak eklemektedir
-            document.getElementById(
-              `helptext-button-${id}`
-            ).setAttribute("data-hint",`${el.value.trim()}`);
+            document
+              .getElementById(`helptext-button-${id}`)
+              .setAttribute("data-hint", `${el.value.trim()}`);
             // Buton görünürlüğü
             document.getElementById(`helptext-button-${id}`).style.display =
               "block";
@@ -526,9 +525,9 @@
             result_form[`${id}`]["helptext"] = el.value.trim();
           } else {
             // data-hint attribute'ünü siliyoruz
-            document.getElementById(
-              `helptext-button-${id}`
-            ).removeAttribute("data-hint");
+            document
+              .getElementById(`helptext-button-${id}`)
+              .removeAttribute("data-hint");
             // Buton görünürlüğü
             document.getElementById(`helptext-button-${id}`).style.display =
               "none";
@@ -559,67 +558,118 @@
         result_form[`${id}`]["placeholder"] = el.value.trim();
       }
 
+      // CSS direkt input'a uygulanacaktır
       function changeCSS(id, el) {
+        // sağ-sol boşluklar temizlendi.
+        // \n karakterleri temizlendi.
+        let up_css = el.value.trim().replaceAll("\n", "");
+        // style attribute'ü silinir
         document
           .getElementById(`real-component-${id}`)
           .removeAttribute("style");
+        // \n değerleri var ise temizlenerek tekrar güncel css değerleri ile tekrar eklenir
         document
           .getElementById(`real-component-${id}`)
-          .setAttribute("style", el.value.trim().replaceAll("\n", ""));
-        result_form[`${id}`]["css"] = el.value
-          .trim()
-          .replaceAll("\n", "")
-          .replaceAll(" ", "");
+          .setAttribute("style", up_css);
+        // Form elemanında da güncelleme sağladık
+        result_form[`${id}`]["css"] = up_css;
       }
 
-      function changeValue(id, el) {
-        document.getElementById(`real-component-${id}`).value = el.value;
-      }
-
+      // name değeri güncelleme
       function changeName(id, name) {
+        // name değeri boş değil ise
         if (name.trim() != "") {
+          // name error message kutusu görünürlüğü kapatılacaktır
           document.getElementsByClassName(
             "name-error-message"
           )[0].style.display = "none";
+          // içerideki mesaj da boşaltılacaktır
           document.getElementsByClassName("name-error-message")[0].textContent =
             "";
+          // Form elemanı değeri de güncellenir
           result_form[`${id}`]["name"] = name.trim();
+          // result_form içerisindeki tüm elemanlar
+          // yani eklenmiş tüm form elemanları döndürülür
           Object.keys(result_form).forEach((el) => {
+            // Dönen eleman mevcut eleman ile aynı değilse
             if (el != id) {
+              // name değerlerini karşılaştır
+              // girilen name değeri ile aynı değer daha önce girildiyse
               if (result_form[el]["name"] == name) {
-                document.getElementsByClassName(
-                  "name-error-message"
-                )[0].style.display = "block";
+                // name-error-message hatası eklendi
                 document.getElementsByClassName(
                   "name-error-message"
                 )[0].innerHTML =
                   "Bu isim başka form elemanına ait!<br/>Lütfen başka bir isim belirle!";
+                // name-error-message görünür hale getirildi
+                document.getElementsByClassName(
+                  "name-error-message"
+                )[0].style.display = "block";
               }
             }
           });
         }
       }
 
+      // Validation regex değeri
       function changeRegex(id, el) {
+        // Regex ifadesi boş değil ise
         if (el.value.trim() != "") {
+          // Yeni regex değeri geldiyse ve validation son değeri 'false' ise
           if (result_form[`${id}`]["validation"] == false) {
+            // boş nesneye dönüştür
             result_form[`${id}`]["validation"] = {};
           }
+          // Regex ifadesini içeriye yerleştir
           result_form[`${id}`]["validation"]["regex"] = el.value;
+        // Boşsa validation false değerine düşecektir
         } else {
           result_form[`${id}`]["validation"] = false;
         }
       }
 
+      // Validation test metodu
+      function testValidation(id, el) {
+        // Girilen ifade çekilir
+        const inputValue = el.value;
+        // Regex çekilir ve Regex() nesnesine dönüştürülür
+        const regex = new RegExp(result_form[`${id}`]["validation"]["regex"]);
+
+        // ifade ile girilen değer uyuyor mu kontrol edilir
+        if (regex.test(inputValue)) {
+          // uyuyorsa Test isimli input arkaplanı yeşil olacaktır
+          // yani geçerlidir
+          el.classList.remove("invalid");
+          el.classList.add("valid");
+        } else {
+          // uymuyorsa Test isimli input arkaplanı kırmızı olacaktır
+          // yani geçersizdir, regex ifadeye uymamaktadır
+          el.classList.remove("valid");
+          el.classList.add("invalid");
+        }
+
+        // input boş ise arkaplan tekrar beyaz olacaktır
+        if (inputValue === "") {
+          el.classList.remove("valid", "invalid");
+        }
+      }
+
+      // Varsayılan değer güncelleme
       function changeDefault(id, el) {
+        // element tipini aldık
         switch (el.type) {
+          // checkbox tipinde ise
           case "checkbox":
+            // checked değerini güncelledik
             result_form[id]["default"] = el.checked;
             document.getElementById(`real-component-${id}`).checked =
               result_form[id]["default"];
             break;
 
           default:
+            // Diğer durumlar genelde value ile çalışıyor
+            // bu yüzden switch default case'i bu şekilde kalabilir
+            // Özel durumlar üste eklenmeye devam edecektir
             result_form[id]["default"] = el.value;
             document.getElementById(`real-component-${id}`).value =
               result_form[id]["default"];
@@ -627,59 +677,49 @@
         }
       }
 
+      // Validation mesajı güncelleme
       function changeValidationMessage(id, el) {
+        // Eğer regex ifade tanımlı ise
         if (result_form[`${id}`]["validation"]["regex"] != undefined) {
+          // Girilen değer boş değil ise
           if (el.value.trim() != "") {
-            result_form[`${id}`]["validation"]["error"] = "";
+            // Yeni değeri tanımla
             result_form[`${id}`]["validation"]["error"] = el.value;
+          }else{
+            result_form[`${id}`]["validation"]["error"] = "";
           }
-        }
-      }
-
-      function testValidation(id, el) {
-        const inputValue = el.value;
-        const regex = new RegExp(result_form[`${id}`]["value"]);
-
-        if (regex.test(inputValue)) {
-          testInput.classList.remove("invalid");
-          testInput.classList.add("valid");
-        } else {
-          testInput.classList.remove("valid");
-          testInput.classList.add("invalid");
-        }
-
-        if (inputValue === "") {
-          testInput.classList.remove("valid", "invalid");
         }
       }
 
       function renderEditor(el) {
         document.getElementById("edit-component").innerHTML = "";
-        console.log(el)
+        
         let editables = form_elements[el.id.split("-")[0]]["editor"];
 
         let el_id = selected_element.id.split("-")[2];
         for (let i = 0; i < editables.length; i++) {
+          // TODO : Bu kısımdaki tüm replaceAll kısımlarını
+          // render_curly_brackets() metoduna dönüştür
           document.getElementById("edit-component").innerHTML =
             document.getElementById("edit-component").innerHTML +
             `${editor_elements[editables[i]]
-              .replace(
+              .replaceAll(
                 "{{required}}",
                 result_form[`${el_id}`]["required"] ? 'checked=""' : ""
               )
-              .replace("{{id}}", el_id)
-              .replace("{{label}}", result_form[`${el_id}`]["label"].trim())
-              .replace(
+              .replaceAll("{{id}}", el_id)
+              .replaceAll("{{label}}", result_form[`${el_id}`]["label"].trim())
+              .replaceAll(
                 "{{helptext}}",
                 result_form[`${el_id}`]["helptext"] == false
                   ? ""
                   : result_form[`${el_id}`]["helptext"]
               )}`
-              .replace("{{css}}", result_form[`${el_id}`]["css"])
-              .replace("{{name}}", result_form[`${el_id}`]["name"])
-              .replace("{{class}}", result_form[`${el_id}`]["class"])
-              .replace("{{default}}", result_form[`${el_id}`]["default"])
-              .replace(
+              .replaceAll("{{css}}", result_form[`${el_id}`]["css"])
+              .replaceAll("{{name}}", result_form[`${el_id}`]["name"])
+              .replaceAll("{{class}}", result_form[`${el_id}`]["class"])
+              .replaceAll("{{default}}", result_form[`${el_id}`]["default"])
+              .replaceAll(
                 "{{placeholder}}",
                 result_form[`${el_id}`]["placeholder"]
 
