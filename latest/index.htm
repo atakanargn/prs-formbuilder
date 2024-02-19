@@ -6,6 +6,7 @@
     <title>Fedora Form Builder</title>
     <link rel="stylesheet" href="assets/css/style.css" />
     <link rel="stylesheet" href="assets/css/dragula.css" />
+    <link rel="stylesheet" href="assets/css/hint.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,7 +31,48 @@
             <div class="form-component" id="edit-component"></div>
           </ul>
         </div>
-        <div class="tabs" id="tab-general">GENERAL</div>
+        <div class="tabs" id="tab-general">
+          <div class="form-component">
+            <div class="form-editor">
+              <label> Form adı </label>
+              <input type="text" id="form_name" value="" />
+            </div>
+            <div class="form-editor">
+              <label> Anahtar </label>
+              <input type="text" id="form_key" value="" />
+            </div>
+            <div class="form-editor">
+              <label> Hedef </label>
+              <input type="text" id="form_target" value="formHandle" />
+            </div>
+            <div class="form-editor">
+              <label> Hedef Tablo </label>
+              <input type="text" id="form_target_table" value="" />
+            </div>
+            <div class="form-editor">
+              <label> Function </label>
+              <input type="text" id="form_function" value="" />
+            </div>
+            <div class="form-editor">
+              <label> Yönlendirme </label>
+              <input type="text" id="form_redirect" value="" />
+            </div>
+            <div class="form-editor">
+              <label> Yetki </label>
+              <input type="text" id="form_authorization" value="" />
+            </div>
+            <div class="form-editor">
+              <label> Görünüm </label>
+              <select id="form_authorization">
+                <option val="0">Tam görünüm</option>
+                <option val="1">Yarım görünüm</option>
+              </select>
+            </div>
+            <div class="form-editor">
+              <button id="save_form">Kaydet</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div>
         <ul class="form-edit-tabs" id="form-tabs2">
@@ -45,162 +87,317 @@
     </div>
 
     <script src="assets/js/dragula.js"></script>
+    <script src="assets/js/hint.js"></script>
     <script src="assets/js/form_elements.js"></script>
     <script src="assets/js/form-utils.js"></script>
     <script>
+      // Seçili element
       var selected_element;
 
-      var result_form = [];
+      // Düzenlenen form elemanları
+      var result_form = {};
 
       window.addEventListener("load", () => {
-        // Form elementlerini listeleme
+        // form_elements.js içerisinden gelen
+        // Tüm form elemanlarını döndürüyoruz
         Object.keys(form_elements).forEach((el) => {
+          // Her elemanı bir liste elemanı içerisine ekleyeceğiz
           let obj = document.createElement("li");
+          // Her eleman için ikon ekliyoruz
           let img = document.createElement("img");
           img.src = `/assets/img/elements/${el}.svg`;
+          // Liste içine ikonu ekledik
           obj.appendChild(img);
+          // Form elemanı ismini de ikonun sonrasına ekledik
           obj.innerHTML = obj.innerHTML + form_elements[el]["name"];
+          // Form elemanı id'sini ("boolean","text","select",vs.)
+          // bu liste elemanının id'sine verdik
           obj.id = el;
+          // 'elements' id'li div içerisine ekledik
           document.getElementById("elements").appendChild(obj);
         });
       });
 
+      // drag&drop kütüphanesi, purejs kütüphanesidir
       var drake = dragula(
         [
+          // elements üzerinden
           document.getElementById("elements"),
+          // preview div'i üzerine sürükleme işlemi yapılacak
           document.getElementById("preview"),
         ],
         {
+          // Sadece elements kaynağından kopyalama işlemi yapılabilir.
           copy: (el, source) => {
             return source.id === "elements";
           },
+          // 'elements' div'i üzerine yapılan
+          // sürükleme işlemlerine izin verilmeyecek
           accepts: (el, target, source, sibling) => {
             return target !== document.getElementById("elements");
           },
+          // Boşluğa bırakılan elemanlar yok olacaktır
+          // 'elements' copy özelliğine sahip olduğu için onda çalışmayacaktır
+          // sadece düzenlenen form elemanları boşluğa sürükleyince silinecektir
           removeOnSpill: true,
         }
       )
+        // Eleman sürükleme eventi
         .on("drag", (element) => {
+          // Eğer 'id' değeri içerisinde '-' var ise
+          // 'preview' üzerinden yapılan bir sürükleme
+          // işlemi anlamına gelir
           if (element.id.includes("-")) {
+            // Bu sürükleme işlemlerinde sürüklenen elementi seç
             selectForEdit(element);
           }
         })
+        // Eleman bırakma eventi
         .on("drop", (element, target, source) => {
+          // Eğer 'id' değeri içerisinde '-' yok ise
+          // 'elements' üzerinden yapılan bir sürükleme
+          // işlemi anlamına gelir
           if (!element.id.includes("-")) {
+            // Boş bir div oluştur
             let div = document.createElement("div");
+            // 'form-edit' class'ını ekle
             div.classList.add("form-edit");
-            let uts = getUTC();
+            // randomID() metodu ile 16 haneli bir
+            // rastgele id üretiyoruz
+            let uts = randomID();
 
-            let template = form_elements[element.id]["template"].replaceAll(
-              "{{id}}",
-              uts
+            // Her eleman için oluşturulan obje
+            var element_object = {
+              id: `${uts}`, // randomID()
+              order: -1, // Order ilk eklenen "-1" hemen sonra sıralama tekrar yapılacak
+              type: element.id, // form_elements key değeri direkt type olarak gelecektir
+              width: "100%", // Eleman ilk yatay uzunluk değeri 100 olarak gelecektir
+              name: `name-${uts}`, // Geçici bir isim
+              label: form_elements[element.id]["name"], // form_elements name değeri ilk etiket olarak belirlenir
+              helptext: false, // helptext başlangıçta kapalı
+              helptext_visible: "display:none;", // visible değeri başlangıçta kapalı
+              required: true, // Zorunlu değeri ilk değer true
+              class: "",
+              css: "",
+              condition: 0, // Aktif - Pasif - Ekle - Düzenle
+
+              placeholder: "",
+              validation: false,
+
+              default: form_elements[element.id]["default"],
+              endpoint: false,
+              attr: "",
+              options: false,
+            };
+
+            // result_form dizisine yeni eleman eklenir
+            result_form[`${uts}`] = element_object;
+
+            // form_elements içerisinden elemanın
+            // ["template"] değerini çekiyoruz
+            // render_curly_brackets() metodu ile obje içerisindeki
+            // key değerleri eşleşir ve karşılık gelen değer yerleştirilir
+            let template = render_curly_brackets(
+              element_object,
+              form_elements[element.id]["template"]
             );
 
-            let element_type = element.id;
+            // Yeni element id değeri
+            // içerideki input ile karışmaması için
+            // değeri güncelledik
             element.id = `${element.id}-li-${uts}`;
-            
             element.classList.add("form-element");
-            element.style.width = "100%";
+            element.style.width = element_object.width;
 
-            let buttons = `<button class="increase-button" id="inc-${element.id}" onclick="increaseSizeOfComponent('${element.id}',this);" disabled="">
-          +
-        </button>
-        <input type="number" class="width-input no-spin" min="20" max="100" step="10" onclick="this.select();" onblur="changeWidth('${element.id}',this);" id="width-${element.id}" value="100" />
-        <button class="decrease-button" id="dec-${element.id}" onclick="decreaseSizeOfComponent('${element.id}',this);">
-          -
-        </button>
-        <button class="cancel-button" onclick="cancelComponent('${element.id}');">
-          <img src="/assets/img/cancel.svg" />
-        </button>`;
+            // Sol üstteki butonlar
+            // "SİL","ARTIR","MANUEL ARTIR","EKSİLT"
+            let buttons = `
+            <button class="increase-button" id="inc-${element.id}" onclick="increaseSizeOfComponent('${element.id}',this);" disabled="">
+              +
+            </button>
+            <input type="number" class="width-input no-spin" min="20" max="100" step="10" onclick="this.select();" onblur="changeWidth('${element.id}',this);" id="width-${element.id}" value="100" />
+            <button class="decrease-button" id="dec-${element.id}" onclick="decreaseSizeOfComponent('${element.id}',this);">
+              -
+            </button>
+            <button class="cancel-button" onclick="deleteComponent('${element.id}');">
+              <img src="/assets/img/cancel.svg" />
+            </button>`;
 
+            // Butonlar ve render edilmiş template birleştirildi
             div.innerHTML = buttons + template;
             element.innerHTML = div.outerHTML;
 
+            // Liste elementi click eventi
+            // tetiklenirse mevcut elementi
+            // seçme işlemi için selectForEdit() metodu çağırılır
             element.addEventListener("click", () => {
               selectForEdit(element);
             });
 
-            const obj = {
-              cid:`${uts}`,
-              order:-1,
-              type:element_type,
-              width:"100%",
-              name:"",
-              label:element.getElementsByClassName("form-edit-label")[0].textContent,
-              helptext:false,
-              required:true,
-              class:"",
-              css:"",
-              condition:"Aktif",
-              
-              placeholder:"",
-              validation:false,
-              default:false,
-              endpoint:false,
-              attr:"",
-              options:false,
-              
+            // defaultElement içerideki asıl elementi seçiyoruz
+            var defaultElement = document.getElementById(
+              `real-component-${uts}`
+            );
+            // Içerideki asıl elementin tipi
+            var tagName = defaultElement.tagName.toLowerCase();
+
+            // Tip bunlardan biri ise
+            if (
+              tagName == "input" ||
+              tagName == "textarea" ||
+              tagName == "select"
+            ) {
+              // Bu kısımda eklenen form elemanının "default" değerini render ettikten sonra
+              // formdaki asıl component'in default değeri haline getiriyoruz
+              // farklı element tiplerindeki özel durumlar için switch ile kontrol gerçekleştirdik
+              switch (defaultElement.type) {
+                case "boolean":
+                  defaultElement.removeAttribute("checked");
+                  defaultElement.setAttribute("checked", "");
+                  break;
+                case "checkbox":
+                  defaultElement.removeAttribute("checked");
+                  defaultElement.setAttribute("checked", "");
+                  break;
+                // Genel tip value ile değer aldığı için
+                // switch içerisinde default altına yerlerştirdik
+                default:
+                  defaultElement.value =
+                    form_elements[element_object.type]["default"];
+                  break;
+              }
             }
 
-            result_form[obj['id']] = obj;
+            // Required değeri hem editor, hem editables alanında bu metod ile güncellenecektir
+            changeRequire(`${uts}`, { checked: element_object["required"] });
+            // Önizleme metodu, her form işleminden sonra çalışacaktır
+            // preview();
           }
+          // Sıralama metodu
+          // bırakma işleminde her zaman çalışacaktır
+          // bu sayede form içerisinde elemanlar arası düzenlemede "order" değerleri anlık olarak güncellenir
+          reOrder();
         });
 
+      // Yeniden dizme metodu
+      function reOrder() {
+        // preview içerisindeki tüm childNode'ları aldık
+        // yani "li" içeren tüm elemanlar
+        var lis = document.getElementById("preview").childNodes;
+        // sayaç
+        let cnt = 0;
+        // Liste içerisindeki tüm elemanları döndür
+        lis.forEach((element) => {
+          // id değerini bul
+          let id = element.id.split("-")[2];
+          // Bulunan id değerine sahip listenin "order" değerini
+          // o anki sayaç değerine güncelle
+          result_form[`${id}`]["order"] = cnt;
+          // sayacı artır
+          cnt++;
+        });
+      }
+
+      // TODO : Preview metodu
+      // build.html içerisindeki şekilde build etmek üzere düzenlenecek
+      function preview() {
+        var lis = document.getElementById("preview").childNodes;
+        preview_tab = document.getElementById("tab2-preview");
+        preview_tab.innerHTML = "";
+        lis.forEach((element) => {
+          var add_form =
+            element.getElementsByClassName("form-component")[0].innerHTML;
+          preview_tab.innerHTML = preview_tab.innerHTML + add_form;
+        });
+      }
+
+      // Form elemanı seçim metodu
       function selectForEdit(el) {
+        // Eğer mevcutta seçili eleman zaten tıklanan eleman değilse
         if (selected_element != el) {
-          const elements = document
-            .getElementById("preview")
-            .getElementsByTagName("li");
-          for (let i = 0; i < elements.length; i++) {
-            elements[i].classList.remove("select-for-edit");
-          }
+          // Preview içerisindeki tüm elemanları listeye aldık
+          const elements = [
+            ...document.getElementById("preview").getElementsByTagName("li"),
+          ];
+          // Tüm elemanları döndürdük
+          elements.forEach((element) => {
+            // Elemanların classList'i içerisinden "select-for-edit" class'ını sildik
+            // unselected gösterdik elemanı
+            element.classList.remove("select-for-edit");
+          });
+          // Sadece bizim tıkladığımız elemana
+          // "select-for-edit" class'ını ekledik
           el.classList.add("select-for-edit");
+          // Seçim işlemi gerçekleştikten sonra
+          // otomatik "Düzenleme" tabını aktif ettik
           tabs1.change("tab-edit");
+          // selected_element'i tıklanan elemente eşitledik
           selected_element = el;
+          // "Düzenleme" tabı içerisindeki editable alanları render ettik
           renderEditor(selected_element);
         }
       }
 
-      function getUTC() {
-        return `${
-          Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000
-        }${Math.floor(new Date().getTime() / 1000)}`;
-      }
-
-      // Quick action buttons
-      function cancelComponent(id) {
+      // Quick action : Delete button
+      function deleteComponent(id) {
+        // id'si verilen elemeanı bulduk
+        // preview içerisinden sildik
         document
           .getElementById("preview")
           .removeChild(document.getElementById(id));
+        // Form elemanları tab'ına geçiş yaptık
+        // selected_element değerini de null yaptık
+
+        // TODO : setTimeout kaldırılacak
+        // neden kullanılıyor hatırlamıyorum, denemesi yapılacak
         setTimeout(() => {
           tabs1.change("tab-elements");
           selected_element = null;
         }, 2);
       }
 
+      // Form elemanı yatay genişlik artırma
       function increaseSizeOfComponent(id, el) {
+        // Form elemanı en dışı seçildi yani liste
         let li = document.getElementById(`${id}`);
+        // width değeri eğer mevcut width değeri
+        //  '100' değerinden küçük ise +10 eklenerek güncellendi
+        // değilse yani '100' veya fazlası ise mevcut değerinde kaldı ve güncellenmedi
         li.style.width =
           li.style.width.split("%")[0] < 100
             ? `${parseInt(li.style.width.split("%")[0]) + 10}%`
             : li.style.width;
+
+        // Eğer yeni değer "100%" oldu ise
         if (li.style.width == "100%") {
+          // Artırma butonunu disabled yapıyoruz
           el.setAttribute("disabled", "");
+          // Azaltma butonunu enabled yapıyoruz
           document.getElementById(`dec-${id}`).removeAttribute("disabled");
         }
 
+        // Eğer yeni değer "20%"den büyük ise
         if (li.style.width.split("%")[0] > 20) {
+          // Azaltma butonunu enabled yapıyoruz
           document.getElementById(`dec-${id}`).removeAttribute("disabled");
         }
 
+        // width input değerini ise tekrar güncelliyoruz
         let width_input = document.getElementById(`width-${id}`);
         width_input.value = li.style.width.replace("%", "");
+
+        // TODO : Width güncellemesi editable alanındaki input için de yapılacak.
       }
 
+      // Şarkı önerisi
+      // https://www.youtube.com/watch?v=SsKT0s5J8ko
+
+      // Form elemanı yatay genişlik azaltma
+      // increaseSizeOfComponent() benzer mantıkta çalışır
       function decreaseSizeOfComponent(id, el) {
         let li = document.getElementById(`${id}`);
         li.style.width =
-          li.style.width.split("%")[0] >= 30
+          li.style.width.split("%")[0] > 20
             ? `${parseInt(li.style.width.split("%")[0]) - 10}%`
             : li.style.width;
         if (li.style.width == "20%") {
@@ -214,57 +411,152 @@
 
         let width_input = document.getElementById(`width-${id}`);
         width_input.value = li.style.width.replace("%", "");
+        // TODO : Width güncellemesi editable alanındaki input için de yapılacak.
+
       }
 
+      // TODO Min func
+      function changeMin(id, el) {}
+
+      // TODO Max func
+      function changeMax(id, el) {}
+
+      // TODO Step func
+      function changeStep(id, el) {}
+
+      // TODO Attr func
+      function changeAttr(id, el) {}
+
+      // TODO Rows func
+      function changeRows(id, el) {}
+
+      // TODO Multiple func
+      function changeMultiple(id, el) {}
+
+      // TODO Endpoint func
+      function changeEndpoint(id, el) {}
+
+      // TODO Endpoint test func
+      function testEndpoint(id, el) {}
+
+      // Width değişikliği olduğunda tetiklenen metod
       function changeWidth(id, el) {
         el.value = roundToTen(el.value, 20, 100, 10);
         let li = document.getElementById(`${id}`);
         li.style.width = `${el.value}%`;
+        // TODO : Hem quick actions hem de editable alanındaki width değerlerini güncelle
       }
 
       // Component Edit Functions
-      function addOption(id,el){
-        let new_option = new Option(el.parentNode.getElementsByTagName("input")[0].value, el.parentNode.getElementsByTagName("input")[1].value);
-
+      function addOption(id, el) {
+        let new_option = new Option(
+          el.parentNode.getElementsByTagName("input")[0].value,
+          el.parentNode.getElementsByTagName("input")[1].value
+        );
       }
 
+      // Required alanında herhangi bir değişiklik olursa
+      // bu metod çağırılır
       function changeRequire(id, el) {
-        if (el.checked) {
-          document.getElementById(`component-required-${id}`).style.display =
-            "block";
-        } else {
-          document.getElementById(`component-required-${id}`).style.display =
-            "none";
+        // form elemanı required özelliğine sahip mi?
+        if (
+          document
+            .getElementById(`form-component-${id}`)
+            .getElementsByClassName("comp-required").length != 0
+        ) {
+          // required alanı açık ise
+          if (el.checked) {
+            // required sembolü gösterilecek
+            document.getElementById(`component-required-${id}`).style.display =
+              "block";
+          } else {
+            // required sembolü gösterilmeyecek
+            document.getElementById(`component-required-${id}`).style.display =
+              "none";
+          }
+          // Sonuç istenen id'ye sahip form elemanı bulunup güncellenir
+          result_form[id]["required"] = el.checked;
         }
       }
 
+      // Koşul değiştirme
+      function changeCondition(id, el) {
+        // Direkt option değerlerini alacaktır
+        // 0 - 1 - 2 - 3
+        // Aktif - Pasif - Ekle - Düzenle
+        result_form[`${id}`]["condition"] = el.value;
+      }
+
+      // Etiket değiştirme metodu
       function changeLabel(id, el) {
-        document.getElementById(`component-label-${id}`).innerHTML = el.value;
-      }
-
-      function changeHelpText(id, el) {
-        if (el.value.trim().length != 0) {
-          document.getElementById(
-            `comp-helptext-${id}`
-          ).innerHTML = `${el.value} <a href="#" onclick="toggleHelp('${id}')">[X]</a>`;
-          document.getElementById(`helptext-button-${id}`).style.display =
-            "block";
-        } else {
-          document.getElementById(`comp-helptext-${id}`).innerHTML = "";
-          document.getElementById(`helptext-button-${id}`).style.display =
-            "none";
+        // Form elemanı label özelliğine sahip mi?
+        if (
+          document
+            .getElementById(`form-component-${id}`)
+            .getElementsByClassName(`form-edit-label`).length != 0
+        ) {
+          // Label boşluklar temizlendikten sonra yerine yerleştirilir
+          document.getElementById(`component-label-${id}`).innerHTML =
+            el.value.trim();
+          // Sonuç istenen id'ye sahip form elemanı bulunup güncellenir
+          result_form[id]["label"] = el.value.trim();
         }
       }
 
-      function toggleHelp(id) {
-        document.getElementById(`comp-helptext-${id}`).classList.toggle("show");
+      // Yardım yazısı güncelleme
+      function changeHelpText(id, el) {
+        // Eleman özelliğe sahip mi?
+        if (
+          document
+            .getElementById(`form-component-${id}`)
+            .getElementsByClassName("helptext-button").length != 0
+        ) {
+          // Yardım kutusundan gelen değerin uzunluğu '0' değil ise
+          if (el.value.trim().length != 0) {
+            // data-hint attribute'ünü güncelliyoruz
+            // hint.js kütüphanesi data-hint özelliği olan objeler
+            // hint box özelliğini otomatik olarak eklemektedir
+            document.getElementById(
+              `helptext-button-${id}`
+            ).setAttribute("data-hint",`${el.value.trim()}`);
+            // Buton görünürlüğü
+            document.getElementById(`helptext-button-${id}`).style.display =
+              "block";
+            // Form elemanı içerisindeki değeri de güncelliyoruz
+            result_form[`${id}`]["helptext"] = el.value.trim();
+          } else {
+            // data-hint attribute'ünü siliyoruz
+            document.getElementById(
+              `helptext-button-${id}`
+            ).removeAttribute("data-hint");
+            // Buton görünürlüğü
+            document.getElementById(`helptext-button-${id}`).style.display =
+              "none";
+            // Form elemanı içerisindeki değeri de güncelliyoruz
+            result_form[`${id}`]["helptext"] = "";
+          }
+        }
       }
 
+      // Class değeri güncelleme
       function changeClass(id, el) {
-        console.log(id, el);
+        // Component class değeri güncellenir
+        // Direkt üst div'i aldık, template'e en uygun güncelleme yöntemi bu şekidle olacaktır
+        document
+          .getElementById(`form-component-${id}`)
+          .setAttribute("class", el.value.trim());
+        // Form elemanında da güncelleme sağladık
+        result_form[`${id}`]["class"] = el.value.trim();
+      }
+
+      // Placeholder değeri güncelleme metodu
+      function changePlaceholder(id, el) {
+        // inputları bulup placeholder değerlerini güncelledik
         document
           .getElementById(`real-component-${id}`)
-          .setAttribute("class", el.value);
+          .setAttribute("placeholder", el.value.trim());
+        // Form elemanında da güncelleme sağladık
+        result_form[`${id}`]["placeholder"] = el.value.trim();
       }
 
       function changeCSS(id, el) {
@@ -273,96 +565,150 @@
           .removeAttribute("style");
         document
           .getElementById(`real-component-${id}`)
-          .setAttribute(
-            "style",
-            el.value.replaceAll("\n", "").replaceAll(" ", "")
-          );
+          .setAttribute("style", el.value.trim().replaceAll("\n", ""));
+        result_form[`${id}`]["css"] = el.value
+          .trim()
+          .replaceAll("\n", "")
+          .replaceAll(" ", "");
       }
 
       function changeValue(id, el) {
         document.getElementById(`real-component-${id}`).value = el.value;
       }
 
-      function getForm() {
-        const elements = document
-          .getElementById("preview")
-          .getElementsByTagName("li");
-        for (let i = 0; i < elements.length; i++) {
-          let id = elements[i].id.split("-")[2];
-          let obj = {
-            type: elements[i].id.split("-")[0],
-            width: elements[i].style.width,
-            name: document.getElementById(`component-name-input-${id}`).value,
-            label: elements[i]
-              .getElementsByTagName("label")[0]
-              .textContent.trim(),
-            required:
-              elements[i].getElementsByClassName("comp-required")[0].style
-                .display == "block",
-            helptext:
-              elements[i].getElementsByClassName("helptext-button")[0].style
-                .display == "block"
-                ? elements[i]
-                    .getElementsByClassName("popover-content")[0]
-                    .textContent.replace(" [X]", "")
-                    .trim()
-                : false,
-            class: document
-              .getElementById(`real-component-${id}`)
-              .classList.toString(),
-            css: document.getElementById(`real-component-${id}`).style.cssText,
-            condition: document.getElementById(`component-condition-${id}`)
-              .value,
-          };
-          console.log(obj);
+      function changeName(id, name) {
+        if (name.trim() != "") {
+          document.getElementsByClassName(
+            "name-error-message"
+          )[0].style.display = "none";
+          document.getElementsByClassName("name-error-message")[0].textContent =
+            "";
+          result_form[`${id}`]["name"] = name.trim();
+          Object.keys(result_form).forEach((el) => {
+            if (el != id) {
+              if (result_form[el]["name"] == name) {
+                document.getElementsByClassName(
+                  "name-error-message"
+                )[0].style.display = "block";
+                document.getElementsByClassName(
+                  "name-error-message"
+                )[0].innerHTML =
+                  "Bu isim başka form elemanına ait!<br/>Lütfen başka bir isim belirle!";
+              }
+            }
+          });
+        }
+      }
+
+      function changeRegex(id, el) {
+        if (el.value.trim() != "") {
+          if (result_form[`${id}`]["validation"] == false) {
+            result_form[`${id}`]["validation"] = {};
+          }
+          result_form[`${id}`]["validation"]["regex"] = el.value;
+        } else {
+          result_form[`${id}`]["validation"] = false;
+        }
+      }
+
+      function changeDefault(id, el) {
+        switch (el.type) {
+          case "checkbox":
+            result_form[id]["default"] = el.checked;
+            document.getElementById(`real-component-${id}`).checked =
+              result_form[id]["default"];
+            break;
+
+          default:
+            result_form[id]["default"] = el.value;
+            document.getElementById(`real-component-${id}`).value =
+              result_form[id]["default"];
+            break;
+        }
+      }
+
+      function changeValidationMessage(id, el) {
+        if (result_form[`${id}`]["validation"]["regex"] != undefined) {
+          if (el.value.trim() != "") {
+            result_form[`${id}`]["validation"]["error"] = "";
+            result_form[`${id}`]["validation"]["error"] = el.value;
+          }
+        }
+      }
+
+      function testValidation(id, el) {
+        const inputValue = el.value;
+        const regex = new RegExp(result_form[`${id}`]["value"]);
+
+        if (regex.test(inputValue)) {
+          testInput.classList.remove("invalid");
+          testInput.classList.add("valid");
+        } else {
+          testInput.classList.remove("valid");
+          testInput.classList.add("invalid");
+        }
+
+        if (inputValue === "") {
+          testInput.classList.remove("valid", "invalid");
         }
       }
 
       function renderEditor(el) {
         document.getElementById("edit-component").innerHTML = "";
+        console.log(el)
         let editables = form_elements[el.id.split("-")[0]]["editor"];
+
+        let el_id = selected_element.id.split("-")[2];
         for (let i = 0; i < editables.length; i++) {
           document.getElementById("edit-component").innerHTML =
             document.getElementById("edit-component").innerHTML +
             `${editor_elements[editables[i]]
-              .replace("{{id}}", el.id.split("-")[2])
               .replace(
-                "{{label}}",
-                form_elements[el.id.split("-")[0]]["name"]
-              )}`;
+                "{{required}}",
+                result_form[`${el_id}`]["required"] ? 'checked=""' : ""
+              )
+              .replace("{{id}}", el_id)
+              .replace("{{label}}", result_form[`${el_id}`]["label"].trim())
+              .replace(
+                "{{helptext}}",
+                result_form[`${el_id}`]["helptext"] == false
+                  ? ""
+                  : result_form[`${el_id}`]["helptext"]
+              )}`
+              .replace("{{css}}", result_form[`${el_id}`]["css"])
+              .replace("{{name}}", result_form[`${el_id}`]["name"])
+              .replace("{{class}}", result_form[`${el_id}`]["class"])
+              .replace("{{default}}", result_form[`${el_id}`]["default"])
+              .replace(
+                "{{placeholder}}",
+                result_form[`${el_id}`]["placeholder"]
+
+                // TODO : replace min
+                // TODO : replace max
+                // TODO : replace step
+                // TODO : replace attr
+                // TODO : replace endpoints
+                // TODO : replace width
+                // TODO : replace rows
+                // TODO : replace rows
+              );
+
+          document.getElementById("edit-component").innerHTML = document
+            .getElementById("edit-component")
+            .innerHTML.replaceAll(
+              `{{condition_selected_${result_form[`${el_id}`]["condition"]}}}`,
+              "selected"
+            );
+          try {
+            for (let j = 0; j < 3; j++) {
+              if (result_form[`${el_id}`]["condition"] != j)
+                document.getElementById("edit-component").innerHTML = document
+                  .getElementById("edit-componenet")
+                  .innerHTML.replaceAll(`{{condition_selected_${j}}}`, "");
+            }
+          } catch (err) {}
         }
       }
-
-      /*
-        var m_pos;
-        var resize_el;
-        function resize(e) {
-          var parent = resize_el.parentNode.parentNode.parentNode;
-          console.log(parent)
-          var dx = m_pos - e.x;
-          m_pos = e.x;
-          parent.style.width =
-            parseInt(getComputedStyle(parent, "").width) + dx + "px";
-        }
-
-
-          resize_el = document.getElementById("resize");
-          resize_el.addEventListener(
-            "mousedown",
-            function (e) {
-              m_pos = e.x;
-              document.addEventListener("mousemove", resize, false);
-            },
-            false
-          );
-          document.addEventListener(
-            "mouseup",
-            function () {
-              document.removeEventListener("mousemove", resize, false);
-            },
-            false
-          );
-        */
 
       // FedoraTab library
       class FedoraTab {
