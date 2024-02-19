@@ -251,8 +251,7 @@ body {
 }
 
 .helptext-button {
-    position:absolute;
-    left:116px;
+    position:relative;
     background-color: #888;
     color: #FFF;
     width: 20px;
@@ -261,6 +260,7 @@ body {
     font-weight: bolder;
     border-radius: 16px;
     border: 1px dotted #999;
+    display:none;
 }
 
 .test-class {
@@ -272,8 +272,13 @@ body {
 }
 
 .popover-content {
+    text-align: left;
+    padding-left:0;
+    width:240px;
     display: none;
     position: relative;
+    bottom:38px;
+    left:42px;
     background-color: #222;
     color: #fff;
     font-weight: bolder;
@@ -284,6 +289,7 @@ body {
     border-top-right-radius: 16px;
     border-bottom-right-radius: 16px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    word-wrap: break-word;
 }
 
 .popover-content>a {
@@ -298,8 +304,7 @@ body {
 }
 
 .comp-required {
-    position:absolute;
-    left:138px;
+    position:relative;
     color: red;
     display: none;
     font-weight: bolder;
@@ -309,7 +314,6 @@ body {
 .form-component label {
     display: block;
     margin-bottom: 4px;
-    margin-left: 144px;
 }
 
 .form-component select {
