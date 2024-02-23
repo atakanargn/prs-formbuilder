@@ -15,14 +15,13 @@ var form_elements = {
         template:
             `
             <div class="form-component {{class}}" id="form-component-{{id}}" style="width:{{width}} !important;">
-            <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-            <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
+                <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+                <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
                 <label class="toggle">
-                        <input class="toggle-checkbox" type="checkbox" id="real-component-{{id}}" name="{{name}}">
-                            <div class="toggle-switch"></div>
-                        <span class="toggle-label form-edit-label" id="component-label-{{id}}">{{label}}</span>
+                    <input class="toggle-checkbox" type="checkbox" id="real-component-{{id}}" name="{{name}}">
+                        <div class="toggle-switch"></div>
+                    <span class="toggle-label form-edit-label" id="component-label-{{id}}">{{label}}</span>
                 </label>
-                
             </div>
         `,
         editor: ["required", "label", "help-text", "hr", "condition", "name", "checkbox-default"],
@@ -34,13 +33,12 @@ var form_elements = {
             `
             <div class="form-component" id="form-component-{{id}}" style="width:{{width}} !important;">
                 <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-                <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-                <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-                <div id="comp-helptext-{{id}}" class="popover-content"></div>
+                <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+                <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
                 <textarea id="real-component-{{id}}" name="{{name}}"></textarea>
             </div>
         `,
-        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "default", "placeholder", "hr", "validation"]
+        editor: ["required", "label", "help-text", "class", "css", "rows", "hr", "condition", "name", "default", "placeholder", "hr", "validation"]
         , default: ""
     },
     text: {
@@ -48,12 +46,9 @@ var form_elements = {
         template:
             `
             <div class="form-component" id="form-component-{{id}}" style="width:{{width}} !important;">
-            <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-            <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-            <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-            <div id="comp-helptext-{{id}}" class="popover-content">
-                <span>{{helptext}}</span>
-            </div>
+                <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
+                <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+                <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
                 <input type="text" id="real-component-{{id}}" name="{{name}}" />
             </div>
         `,
@@ -66,39 +61,37 @@ var form_elements = {
             `
             <div class="form-component" id="form-component-{{id}}">
                 <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-                <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-                <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-                <div id="comp-helptext-{{id}}" class="popover-content">{{helptext}}</div>
+                <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+                <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
                 <select id="real-component-{{id}}">
-                    <option>Seçim 1</option>
-                    <option>Seçim 2</option>
-                    <option>Seçim 3</option>
+
                 </select>
             </div>
         `,
-        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "select-options"]
+        default: "0",
+        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "select-options", "endpoint"]
     },
     "float": {
         "name": "Sayı",
         "template": `<div class="form-component" id="form-component-{{id}}">
             <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-            <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-                <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-                <div id="comp-helptext-{{id}}" class="popover-content">{{helptext}}</div>
+            <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+            <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
             <input type="text" onkeypress="restrict_floatInput(event)" id="real-component-{{id}}" />
     </div>`,
-        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name"]
+        default: 0,
+        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "default", "min", "max"]
     },
     "integer": {
         "name": "Tamsayı",
         "template": `<div class="form-component" id="form-component-{{id}}">
             <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-            <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-            <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-            <div id="comp-helptext-{{id}}" class="popover-content">{{helptext}}</div>
+            <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+            <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
             <input type="number" id="real-component-{{id}}" />
     </div>`,
-        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name"]
+        default: 0,
+        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "default", "min", "max"]
     },
     "checkbox": {
         "name": "Checkbox",
@@ -109,57 +102,63 @@ var form_elements = {
             </label>
     </div>
     `,
+        default: "checked",
+        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "default"]
     },
-    "hidden": {
-        "name": "Gizli alan",
+    "html": {
+        "name": "HTML",
         "template": `<div class="form-component" id="form-component-{{id}}">
-            <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-            <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-            <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-            <div id="comp-helptext-{{id}}" class="popover-content">{{helptext}}</div>
-            <input type="hidden" value="" />
+            <div id="real-component-{{id}}" class="html-input">
+                {{default}}
+            </div>
     </div>
     `,
-    },
-    "title": {
-        "name": "Başlık",
-        "template": `<div class="form-component" id="form-component-{{id}}">
-            <h2>
-                Başlık
-            </h2>
-    </div>
-    `,
+        default: "&nbsp;",
+        editor: ["editor-default", "hr", "css", "hr", "condition", "name"]
     },
     "date": {
         "name": "Tarih",
         "template": `<div class="form-component" id="form-component-{{id}}">
             <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-            <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-            <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-            <div id="comp-helptext-{{id}}" class="popover-content">{{helptext}}</div>
-            <input type="date" />
+            <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+            <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
+            <input type="date" id="real-component-{{id}}" value="{{default}}" />
     </div>
     `,
+        default: formatDate(Date.now()),
+        editor:["required","label", "help-text","class","css","hr","condition","name","hr","default"]
     },
     "datetime": {
-        "name": "Tarih - Saat",
+        "name": "Tarih Saat",
         "template": `<div class="form-component" id="form-component-{{id}}">
             <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-            <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-            <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-            <div id="comp-helptext-{{id}}" class="popover-content">{{helptext}}</div>
-            <input type="datetime-local" />
+            <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+            <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
+            <input type="datetime" id="real-component-{{id}}" value="{{default}}" />
     </div>
     `,
+        default: formatDate(Date.now()),
+        editor:["required","label", "help-text","class","css","hr","condition","name","hr","default"]
+    },
+    "time": {
+        "name": "Saat",
+        "template": `<div class="form-component" id="form-component-{{id}}">
+            <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
+            <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+            <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
+            <input type="time" id="real-component-{{id}}" value="{{default}}" />
+    </div>
+    `,
+        default: formatDate(Date.now()),
+        editor:["required","label", "help-text","class","css","hr","condition","name","hr","default"]
     },
     "table": {
         "name": "Tablo",
         "template": `<div class="form-component" id="form-component-{{id}}">
             <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-            <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-            <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-            <div id="comp-helptext-{{id}}" class="popover-content">{{helptext}}</div>
-            <input type="datetime-local" />
+            <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+            <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
+            <input type="text" id="real-component-{{id}}" value="{{default}}" />
     </div>
     `,
     },
@@ -167,9 +166,8 @@ var form_elements = {
         "name": "Dosya",
         "template": `<div class="form-component" id="form-component-{{id}}">
             <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-            <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-            <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-            <div id="comp-helptext-{{id}}" class="popover-content">{{helptext}}</div>
+            <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+            <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
             <input type="file" />
     </div>
     `,
@@ -178,9 +176,8 @@ var form_elements = {
         "name": "İl",
         "template": `<div class="form-component" id="form-component-{{id}}">
             <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
-            <button id="helptext-button-{{id}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
-            <span id="component-required-{{id}}" class="comp-required" style="margin-right:4px;">*</span>
-            <div id="comp-helptext-{{id}}" class="popover-content">{{helptext}}</div>
+            <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
+            <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
             <input type="text" />
     </div>
     `,
@@ -230,16 +227,6 @@ var form_elements = {
                 <option>Seçim 1</option>
                 <option>Seçim 2</option>
             </select>
-    </div>
-    `,
-    },
-    "time": {
-        "name": "Saat",
-        "template": `<div class="form-component" id="form-component-{{id}}">
-            <label>
-            Saat
-            </label>
-            <input type="time" />
     </div>
     `,
     },
@@ -354,11 +341,11 @@ const editor_elements = {
         <label>
             Regex
         </label>
-        <input type="text" oninput="changeRegex('{{id}}',this)" />
+        <input type="text" oninput="changeRegex('{{id}}',this)" value="{{regex}}" />
         <label>
             Hata mesajı
         </label>
-        <input type="text" oninput="changeValidationMessage('{{id}}',this)" />
+        <input type="text" oninput="changeValidationMessage('{{id}}',this)" value="{{error}}" />
         <label>
             Test
         </label>
@@ -392,12 +379,14 @@ const editor_elements = {
         </div>
     </div>
       `,
+    "editor-default": `<div class="editor-default"></div>`
+    ,
     "text-value": `
     <div class="form-editor">
       <label>
           Varsayılan
       </label>
-      <input oninput="changeDefault('{{id}}',this);" type="text" />
+      <input oninput="changeDefault('{{id}}',this);" type="text" value="{{default}}" />
     </div>
     `,
     "select-options": `
@@ -419,72 +408,27 @@ const editor_elements = {
                     </td>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td class="delete-option">
-                        [-]
-                    </td>
-                    <td>
-                        Seçim 1
-                    </td>
-                    <td>
-                        option0
-                    </td>
-                </tr>
-                <tr>
-                    <td class="delete-option">
-                        [-]
-                    </td>
-                    <td>
-                        Seçim 2
-                    </td>
-                    <td>
-                        option1
-                    </td>
-                </tr>
-                <tr>
-                    <td class="delete-option">
-                        [-]
-                    </td>
-                    <td>
-                        Seçim 3
-                    </td>
-                    <td>
-                        option2
-                    </td>
-                </tr>
-                <tr>
-                    <td class="add-option" onclick="addOption('{{id}}',this);">
-                        [+]
-                    </td>
-                    <td>
-                        <input type="text" style="width:100%;" />
-                    </td>
-                    <td>
-                        <input type="text" style="width:100%;" />
-                    </td>
-                </tr>
+            <tbody id="table-add-option">
+
+                
             </tbody>
+            <tfoot id="table-add-options">
+            
+            </tfoot>
         </table>
     </div>
     `,
     min: `<div class="form-editor">
     <label>
-        Minimum (Text alan ise karakter uzunluğu)
+        Minimum (Text ise karakter uzunluğu)
     </label>
-    <input type="number" oninput="changeMin('{{id}}',this.value);" value="{{min}}" />
+    <input type="number" oninput="changeMin('{{id}}',this);" value="{{min}}" />
 </div>`,
     max: `<div class="form-editor">
     <label>
-        Maximum (Text alan ise karakter uzunluğu)
+        Maximum (Text ise karakter uzunluğu)
     </label>
-    <input type="number" oninput="changeMax('{{id}}',this.value);" value="{{max}}" />
-</div>`,
-    step: `<div class="form-editor">
-    <label>
-        Input artış adımı
-    </label>
-    <input type="number" oninput="changeStep('{{id}}',this.value);" value="{{step}}" />
+    <input type="number" oninput="changeMax('{{id}}',this);" value="{{max}}" />
 </div>`,
     attr: `<div class="form-editor">
     <label>
@@ -496,31 +440,32 @@ const editor_elements = {
     <label>
         Endpoint
     </label>
-    <input type="test" oninput="changeEndpoint('{{id}}',this.value);" value="{{endpoint}}" />
+    <input type="text" oninput="changeEndpoint('{{id}}',this);" value="{{endpoint}}" />
     <button class="test-endpoint-button" onclick="testEndpoint('{{id}}',this);">Test Endpoint</button>
-</div>`,
+    <span class="endpoint-error-message"></span>
+    </div>`,
     width: `<div class="form-editor">
     <label>
         Width
     </label>
-    <input type="text" oninput="changeWidth('{{id}}',this.value);" value="{{width}}" />
+    <input type="text" oninput="changeWidth('{{id}}',this);" value="{{width}}" />
 </div>`,
     rows: `<div class="form-editor">
     <label>
         Rows
     </label>
-    <input type="number" oninput="changeRows('{{id}}',this.value);" value="{{rows}}" />
+    <input type="number" oninput="changeRows('{{id}}',this);" value="{{rows}}" min="1" max="6" />
 </div>`,
     multiple: `<div class="form-editor">
     <label class="toggle">
-      <input class="toggle-checkbox" type="checkbox" oninput="changeRequire('{{id}}',this);" {{required}}>
+      <input class="toggle-checkbox" type="checkbox" oninput="changeRequire('{{id}}',this);" {{multiple}}>
       <div class="toggle-switch"></div>
       <span class="toggle-label">Çoklu seçim</span>
     </label>
   </div>`,
     "checkbox-default": `<div class="form-editor">
   <label class="toggle">
-    <input class="toggle-checkbox" type="checkbox" oninput="changeDefault('{{id}}',this);">
+    <input class="toggle-checkbox" type="checkbox" oninput="changeDefault('{{id}}',this);" {{default}}>
     <div class="toggle-switch"></div>
     <span class="toggle-label">Varsayılan</span>
   </label>
