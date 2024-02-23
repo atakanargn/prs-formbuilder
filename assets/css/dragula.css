@@ -6,8 +6,13 @@
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
   filter: alpha(opacity=80);
   list-style: none;
-  font-size: 32px;
+  font-size: 24px;
   font-weight: bolder;
+}
+
+.gu-mirror > img{
+  width:32px;
+  height:32px;
 }
 
 .gu-hide {

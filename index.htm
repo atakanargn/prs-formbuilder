@@ -1,12 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fedora Form Builder</title>
+
     <link rel="stylesheet" href="assets/css/style.css" />
+
     <link rel="stylesheet" href="assets/css/dragula.css" />
     <link rel="stylesheet" href="assets/css/hint.css" />
+    <link rel="stylesheet" href="assets/css/quill.snow.css" />
+    <link rel="stylesheet" href="assets/css/rome.min.css" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -88,11 +93,24 @@
 
     <script src="assets/js/dragula.js"></script>
     <script src="assets/js/hint.js"></script>
-    <script src="assets/js/form_elements.js"></script>
+
     <script src="assets/js/form-utils.js"></script>
+    <script src="assets/js/form_elements.js"></script>
+    <script src="assets/js/quill.js"></script>
+    <script src="assets/js/moment.min.js"></script>
+    <script src="assets/js/rome.min.js"></script>
+
+    <script src="assets/js/element/fedora-simple-select.js"></script>
+
     <script>
+      // TODO Backend form kontrolüne hidden alanlarda eklenecek
+      // TODO Hidden alanlar form genel ayarlarından ekleneblir
+
       // Seçili element
       var selected_element;
+      // For select-default
+      var options_dragula;
+      var fedora_selects = [];
 
       // Düzenlenen form elemanları
       var result_form = {};
@@ -188,6 +206,9 @@
               endpoint: false,
               attr: "",
               options: false,
+              min: false,
+              max: false,
+              rows: 2,
             };
 
             // result_form dizisine yeni eleman eklenir
@@ -247,6 +268,10 @@
               tagName == "textarea" ||
               tagName == "select"
             ) {
+              if (tagName.includes("select")) {
+                addOption(uts, "Seçim 1", "0");
+                addOption(uts, "Seçim 2", "1");
+              }
               // Bu kısımda eklenen form elemanının "default" değerini render ettikten sonra
               // formdaki asıl component'in default değeri haline getiriyoruz
               // farklı element tiplerindeki özel durumlar için switch ile kontrol gerçekleştirdik
@@ -258,6 +283,21 @@
                 case "checkbox":
                   defaultElement.removeAttribute("checked");
                   defaultElement.setAttribute("checked", "");
+                  break;
+                case "date":
+                  defaultElement.type = "text";
+                  rome(defaultElement, {
+                    weekStart: 0,
+                    time: false
+                  });
+                  break;
+                case "datetime":
+                  defaultElement.type = "text";
+                  rome(defaultElement, { weekStart: 0 });
+                  break;
+                case "time":
+                  defaultElement.type = "text";
+                  rome(defaultElement, { time: true, date: false });
                   break;
                 // Genel tip value ile değer aldığı için
                 // switch içerisinde default altına yerlerştirdik
@@ -277,6 +317,11 @@
           // bırakma işleminde her zaman çalışacaktır
           // bu sayede form içerisinde elemanlar arası düzenlemede "order" değerleri anlık olarak güncellenir
           reOrder();
+        })
+        .on("remove", (el, container, source) => {
+          document.getElementById("edit-component").innerHTML = "";
+          tabs1.change("tab-elements");
+          selected_element = null;
         });
 
       // Yeniden dizme metodu
@@ -349,8 +394,11 @@
         // selected_element değerini de null yaptık
 
         // TODO : setTimeout kaldırılacak
-        // neden kullanılıyor hatırlamıyorum, denemesi yapılacak
+        // Buradaki sorun : El ile silme butonuna tıklayınca
+        // önce silme metodu yani bu metod çalışıyor,
+        // sonrasında ise selectForEdit() çalışıyor
         setTimeout(() => {
+          document.getElementById("edit-component").innerHTML = "";
           tabs1.change("tab-elements");
           selected_element = null;
         }, 2);
@@ -414,29 +462,104 @@
         // TODO : Width güncellemesi editable alanındaki input için de yapılacak.
       }
 
-      // TODO Min func
-      function changeMin(id, el) {}
+      // Change minimum func
+      function changeMin(id, el) {
+        if (el.value == "") result_form[`${id}`]["min"] = false;
+        else result_form[`${id}`]["min"] = el.value;
+      }
 
-      // TODO Max func
-      function changeMax(id, el) {}
+      // Change max func
+      function changeMax(id, el) {
+        if (el.value == "") result_form[`${id}`]["max"] = false;
+        else result_form[`${id}`]["max"] = el.value;
+      }
 
-      // TODO Step func
-      function changeStep(id, el) {}
+      // Change element's attribute
+      function changeAttr(id, el) {
+        // Component attr değeri güncellenir
+        result_form[`${id}`]["attr"] = el.value.trim();
+        result_form[`${id}`]["attr"].split(" ").forEach((attr) => {
+          if (attr.includes("="))
+            document
+              .getElementById(`real-component-${id}`)
+              .setAttribute(`${attr.split("=")[0]}`, `${attr.split("=")[1]}`);
+          else
+            document
+              .getElementById(`real-component-${id}`)
+              .setAttribute(`${attr}`, `${attr.split("=")[0]}`);
+        });
+      }
 
-      // TODO Attr func
-      function changeAttr(id, el) {}
-
-      // TODO Rows func
-      function changeRows(id, el) {}
+      // Change rows in textarea
+      function changeRows(id, el) {
+        result_form[`${id}`]["rows"] = el.value.trim();
+        document
+          .getElementById(`real-component-${id}`)
+          .setAttribute("rows", result_form[`${id}`]["rows"]);
+      }
 
       // TODO Multiple func
       function changeMultiple(id, el) {}
 
-      // TODO Endpoint func
-      function changeEndpoint(id, el) {}
+      // Change endpoint
+      function changeEndpoint(id, el) {
+        result_form[`${id}`]["endpoint"] = false;
+        let input_type = selected_element
+          .querySelectorAll(`#real-component-${id}`)[0]
+          .tagName.toLowerCase();
+        switch (input_type) {
+          case "select":
+            result_form[`${id}`]["endpoint"] = el.value;
+            break;
+        }
+      }
 
-      // TODO Endpoint test func
-      function testEndpoint(id, el) {}
+      // Test endpoint
+      function testEndpoint(id, el) {
+        let error_msg = el.parentNode.querySelectorAll(
+          ".endpoint-error-message"
+        )[0];
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", result_form[`${id}`]["endpoint"], true);
+        xhr.onload = function () {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              var jsonResponse = JSON.parse(xhr.responseText);
+            } catch (err) {
+              error_msg.innerHTML = `Sayfadan dönen format bu alan için uygun değil!`;
+              error_msg.style.color = "red";
+              error_msg.style.display = "block";
+            }
+
+            let input_type = selected_element
+              .querySelectorAll(`#real-component-${id}`)[0]
+              .tagName.toLowerCase();
+            switch (input_type) {
+              case "select":
+                fedora_selects.forEach((elem) => {
+                  if (elem.getId() == id) {
+                    elem.add(jsonResponse);
+                  }
+                });
+                break;
+            }
+
+            error_msg.innerHTML = `Dönen değerler başarıyla eklendi!`;
+            error_msg.style.color = "green";
+            error_msg.style.display = "block";
+          } else {
+            error_msg.innerHTML = `Bir hata oluştu : ${xhr.status}`;
+            error_msg.style.color = "red";
+            error_msg.style.display = "block";
+          }
+        };
+        xhr.onerror = function () {
+          error_msg.innerHTML = `Bir hata oluştu!`;
+          error_msg.style.color = "red";
+          error_msg.style.display = "block";
+        };
+        xhr.send();
+      }
 
       // Width değişikliği olduğunda tetiklenen metod
       function changeWidth(id, el) {
@@ -447,11 +570,162 @@
       }
 
       // Component Edit Functions
-      function addOption(id, el) {
-        let new_option = new Option(
-          el.parentNode.getElementsByTagName("input")[0].value,
-          el.parentNode.getElementsByTagName("input")[1].value
-        );
+      function addOption(id, text, value) {
+        let ao_table;
+        let new_option = new Option(text, value);
+
+        document.getElementById(`real-component-${id}`).add(new_option);
+        refreshOptionTable(id);
+      }
+
+      function delOption(id, el) {
+        let selected_element = null;
+        document
+          .getElementById(`real-component-${id}`)
+          .querySelectorAll("option")
+          .forEach((element) => {
+            if (
+              element.value ==
+              el.parentNode.querySelectorAll("td")[2].textContent.trim()
+            ) {
+              selected_element = element;
+              document
+                .getElementById("table-add-option")
+                .removeChild(el.parentNode);
+            }
+          });
+        document
+          .getElementById(`real-component-${id}`)
+          .removeChild(selected_element);
+        refreshOptionTable(id);
+      }
+
+      // Select tipi alanlar için changeDefault
+      function selectDefault(id, value) {
+        result_form[`${id}`]["default"] = value;
+        document.getElementById(`real-component-${id}`).value = value;
+        refreshOptionTable(id);
+      }
+
+      // Select türündeki inputlar için gelen seçim ekleme bölümünü
+      // yenilemeye yarayan metod
+      function refreshOptionTable(id) {
+        if (
+          document
+            .getElementById(`real-component-${id}`)
+            .tagName.toLowerCase()
+            .includes("select")
+        ) {
+          let ao_table;
+          try {
+            ao_table = document.getElementById("table-add-option");
+            ao_table.innerHTML = "";
+
+            document
+              .getElementById(`real-component-${id}`)
+              .querySelectorAll("option")
+              .forEach((element) => {
+                let is_default =
+                  element.value ==
+                  document.getElementById(`real-component-${id}`).value
+                    ? "default-class"
+                    : "";
+
+                ao_table.innerHTML =
+                  ao_table.innerHTML +
+                  `
+          <tr onclick="selectDefault('${id}','${
+                    element.value
+                  }');" class="${is_default}">
+            <td class="delete-option" onclick="delOption('${id}',this);">
+                [-]
+            </td>
+            <td>
+              ${element.innerHTML.trim()}
+            </td>
+            <td>
+              ${element.value}
+            </td>
+          </tr>
+                `;
+              });
+
+            document.getElementById("table-add-options").innerHTML = `
+          <tr id="add-option">
+            <td class="add-option" onclick="addOption('${id}',this.parentNode.getElementsByTagName(\`input\`)[0].value,this.parentNode.getElementsByTagName(\`input\`)[1].value);">
+                [+]
+            </td>
+            <td>
+                <input type="text" style="width:100%;" />
+            </td>
+            <td>
+                <input type="text" style="width:100%;" />
+            </td>
+          </tr>
+        `;
+
+            try {
+              options_dragula.destroy();
+            } catch (err) {}
+
+            options_dragula = dragula(
+              [document.getElementById("table-add-option")],
+              {
+                copy: false,
+                // 'elements' div'i üzerine yapılan
+                // sürükleme işlemlerine izin verilmeyecek
+                accepts: (el, target, source, sibling) => {
+                  return el.id != "add-option";
+                },
+              }
+            ).on("drop", (el) => {
+              let opts = document
+                .getElementById("table-add-option")
+                .querySelectorAll("tr");
+
+              document.getElementById(`real-component-${id}`).innerHTML = "";
+              opts.forEach((element) => {
+                let is_selected =
+                  element.querySelectorAll("td")[2].textContent.trim() ==
+                  result_form[`${id}`]["default"]
+                    ? "selected"
+                    : "";
+                document.getElementById(`real-component-${id}`).innerHTML =
+                  document.getElementById(`real-component-${id}`).innerHTML +
+                  `<option value="${element
+                    .querySelectorAll("td")[2]
+                    .textContent.trim()}" ${is_selected}>${element
+                    .querySelectorAll("td")[1]
+                    .textContent.trim()}</option>`;
+              });
+            });
+          } catch (err) {}
+
+          result_form[`${id}`]["options"] = document.getElementById(
+            `real-component-${id}`
+          ).innerHTML;
+
+          let index = -1;
+          fedora_selects.forEach((el) => {
+            if (el.getId() == id) {
+              el.destroy();
+              index = fedora_selects.indexOf(el);
+            }
+          });
+
+          if (index > -1) {
+            fedora_selects.splice(index, 1);
+          }
+
+          fedora_selects.push(
+            new FedoraSelect(`#real-component-${id}`, {
+              search: true,
+              placeholder: result_form[`${id}`]["placeholder"],
+              width: "100%",
+              custom_id: `${id}`,
+            })
+          );
+        }
       }
 
       // Required alanında herhangi bir değişiklik olursa
@@ -622,7 +896,7 @@
           }
           // Regex ifadesini içeriye yerleştir
           result_form[`${id}`]["validation"]["regex"] = el.value;
-        // Boşsa validation false değerine düşecektir
+          // Boşsa validation false değerine düşecektir
         } else {
           result_form[`${id}`]["validation"] = false;
         }
@@ -656,24 +930,33 @@
 
       // Varsayılan değer güncelleme
       function changeDefault(id, el) {
-        // element tipini aldık
-        switch (el.type) {
-          // checkbox tipinde ise
-          case "checkbox":
-            // checked değerini güncelledik
-            result_form[id]["default"] = el.checked;
-            document.getElementById(`real-component-${id}`).checked =
-              result_form[id]["default"];
-            break;
+        let tag = document
+          .getElementById(`real-component-${id}`)
+          .tagName.toLowerCase();
+        if (tag == "input") {
+          // element tipini aldık
+          switch (el.type) {
+            // checkbox tipinde ise
+            case "checkbox":
+              // checked değerini güncelledik
+              result_form[id]["default"] = el.checked;
+              document.getElementById(`real-component-${id}`).checked =
+                result_form[id]["default"];
+              break;
 
-          default:
-            // Diğer durumlar genelde value ile çalışıyor
-            // bu yüzden switch default case'i bu şekilde kalabilir
-            // Özel durumlar üste eklenmeye devam edecektir
-            result_form[id]["default"] = el.value;
-            document.getElementById(`real-component-${id}`).value =
-              result_form[id]["default"];
-            break;
+            default:
+              // Diğer durumlar genelde value ile çalışıyor
+              // bu yüzden switch default case'i bu şekilde kalabilir
+              // Özel durumlar üste eklenmeye devam edecektir
+              result_form[id]["default"] = el.value;
+              document.getElementById(`real-component-${id}`).value =
+                result_form[id]["default"];
+              break;
+          }
+        } else if (tag == "div") {
+          result_form[id]["default"] = el.innerHTML;
+          document.getElementById(`real-component-${id}`).innerHTML =
+            result_form[id]["default"];
         }
       }
 
@@ -685,69 +968,104 @@
           if (el.value.trim() != "") {
             // Yeni değeri tanımla
             result_form[`${id}`]["validation"]["error"] = el.value;
-          }else{
+          } else {
             result_form[`${id}`]["validation"]["error"] = "";
           }
         }
       }
 
+      // Düzenleme alanındaki alanları otomatik oluşturan metod
       function renderEditor(el) {
-        document.getElementById("edit-component").innerHTML = "";
-        
+        let edit_component = document.getElementById("edit-component");
+        // Alanı temizledik
+        edit_component.innerHTML = "";
+
+        // Form element, editor alanlarını çektik
         let editables = form_elements[el.id.split("-")[0]]["editor"];
 
+        // Component ID aldık
         let el_id = selected_element.id.split("-")[2];
-        for (let i = 0; i < editables.length; i++) {
-          // TODO : Bu kısımdaki tüm replaceAll kısımlarını
-          // render_curly_brackets() metoduna dönüştür
-          document.getElementById("edit-component").innerHTML =
-            document.getElementById("edit-component").innerHTML +
-            `${editor_elements[editables[i]]
-              .replaceAll(
-                "{{required}}",
-                result_form[`${el_id}`]["required"] ? 'checked=""' : ""
-              )
-              .replaceAll("{{id}}", el_id)
-              .replaceAll("{{label}}", result_form[`${el_id}`]["label"].trim())
-              .replaceAll(
-                "{{helptext}}",
-                result_form[`${el_id}`]["helptext"] == false
-                  ? ""
-                  : result_form[`${el_id}`]["helptext"]
-              )}`
-              .replaceAll("{{css}}", result_form[`${el_id}`]["css"])
-              .replaceAll("{{name}}", result_form[`${el_id}`]["name"])
-              .replaceAll("{{class}}", result_form[`${el_id}`]["class"])
-              .replaceAll("{{default}}", result_form[`${el_id}`]["default"])
-              .replaceAll(
-                "{{placeholder}}",
-                result_form[`${el_id}`]["placeholder"]
 
-                // TODO : replace min
-                // TODO : replace max
-                // TODO : replace step
-                // TODO : replace attr
-                // TODO : replace endpoints
-                // TODO : replace width
-                // TODO : replace rows
-                // TODO : replace rows
-              );
+        // Ilgili editable için mevcut değerleri çektik
+        let condition_selection = `condition_selected_${
+          result_form[`${el_id}`]["condition"]
+        }`;
+        let render_obj = {
+          required: result_form[`${el_id}`]["required"] ? 'checked=""' : "",
+          id: el_id,
+          label: result_form[`${el_id}`]["label"].trim(),
+          helptext:
+            result_form[`${el_id}`]["helptext"] == false
+              ? ""
+              : result_form[`${el_id}`]["helptext"],
+          css: result_form[`${el_id}`]["css"],
+          class: result_form[`${el_id}`]["class"],
+          attr: result_form[`${el_id}`]["attr"],
+          placeholder: result_form[`${el_id}`]["placeholder"],
+          name: result_form[`${el_id}`]["name"],
+          default: result_form[`${el_id}`]["default"],
+          regex:
+            result_form[`${el_id}`]["validation"]["regex"] != undefined
+              ? result_form[`${el_id}`]["validation"]["regex"]
+              : "",
+          error:
+            result_form[`${el_id}`]["validation"]["error"] != undefined
+              ? result_form[`${el_id}`]["validation"]["error"]
+              : "",
+          min:
+            result_form[`${el_id}`]["min"] == false
+              ? ""
+              : result_form[`${el_id}`]["min"],
+          max:
+            result_form[`${el_id}`]["max"] == false
+              ? ""
+              : result_form[`${el_id}`]["max"],
+          endpoint:
+            result_form[`${el_id}`]["endpoint"] != false
+              ? result_form[`${el_id}`]["endpoint"]
+              : "",
+          width: result_form[`${el_id}`]["width"],
+          rows: result_form[`${el_id}`]["rows"],
+          multiple: result_form[`${el_id}`]["multiple"] ? 'checked=""' : "",
+        };
+        render_obj[`${condition_selection}`] = "selected";
 
-          document.getElementById("edit-component").innerHTML = document
-            .getElementById("edit-component")
-            .innerHTML.replaceAll(
-              `{{condition_selected_${result_form[`${el_id}`]["condition"]}}}`,
-              "selected"
-            );
+        // Tüm editable alanları döndürdük
+        editables.forEach((editable) => {
+          // render_curly_brackets() metodu ile istenenleri yukarıdaki objeye göre yerine yerleştirdik
+          edit_component.innerHTML =
+            edit_component.innerHTML +
+            render_curly_brackets(render_obj, editor_elements[editable]);
+
+          // condition alanı için özel durum
+          // selected olmayan değerler için selected var ise
+          // temizledik
           try {
             for (let j = 0; j < 3; j++) {
               if (result_form[`${el_id}`]["condition"] != j)
-                document.getElementById("edit-component").innerHTML = document
+                edit_component.innerHTML = document
                   .getElementById("edit-componenet")
                   .innerHTML.replaceAll(`{{condition_selected_${j}}}`, "");
             }
           } catch (err) {}
-        }
+        });
+
+        try {
+          refreshOptionTable(el_id);
+        } catch (err) {}
+
+        try {
+          let my_editor = new Quill(".editor-default", {
+            theme: "snow",
+            height: "200px",
+          });
+          my_editor.on("text-change", () => {
+            changeDefault(
+              el_id,
+              document.getElementsByClassName("ql-editor")[0]
+            );
+          });
+        } catch (err) {}
       }
 
       // FedoraTab library
