@@ -5,6 +5,7 @@
     width: 10px;
     height: 100%;
     cursor: w-resize;
+    box-sizing: border-box;
 }
 
 * {
@@ -33,31 +34,6 @@ body {
     background-color: #EEE;
     margin-top: 0 !important;
     padding-top: 0 !important;
-}
-
-.form-edit-tabs {
-    list-style-type: none;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-.form-edit-tabs>li {
-    display: inline-block;
-    border: 1px groove #CCC;
-    border-radius: 4px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    border-bottom: none;
-    margin: 0 !important;
-    padding: 6px;
-    cursor: pointer;
-}
-
-.form-edit-tabs>.selected {
-    font-weight: bolder;
-    background-color: #EEE;
-    border-bottom: none;
-    cursor: auto;
 }
 
 .ffb-container {
@@ -185,8 +161,19 @@ body {
     appearance: textfield;
 }
 
+.no-spin {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
 .width-input.no-spin::-webkit-inner-spin-button,
 .width-input.no-spin::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spin::-webkit-inner-spin-button,
+.no-spin::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
@@ -247,6 +234,15 @@ body {
 }
 
 .form-component {
+    top: 100%;
+    left: 0;
+    width: 100%;
+    font-size: 12px;
+    box-sizing: border-box;
+    padding: 4px;
+}
+
+#tab2-preview > .form-component {
     top: 100%;
     left: 0;
     width: 100%;
@@ -317,6 +313,12 @@ body {
     margin-left: 144px;
 }
 
+#tab2-preview > .form-component label {
+    display: block;
+    margin-bottom: 4px;
+    margin-left:0px;
+}
+
 .form-component select {
     background-color: #FFF;
     width: 100%;
@@ -327,7 +329,26 @@ body {
     margin-top: 4px;
 }
 
+#tab2-preview > .form-component select {
+    background-color: #FFF;
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    box-sizing: border-box;
+    margin-top: 4px;
+}
+
 .form-component textarea {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    box-sizing: border-box;
+    margin-top: 4px;
+}
+
+#tab2-preview > .form-component textarea {
     width: 100%;
     padding: 4px;
     border: 1px solid #ccc;
@@ -526,8 +547,16 @@ body {
     border:1px solid #DDD;
 }
 
+
+
 .html-input{
-    margin-left:20%;
+    margin-left:15%;
+}
+
+#tab2-preview > div > .html-input{
+    margin-top:0;
+    margin-left:0;
+    padding-left:0;
 }
 
 /* For datepicker */
@@ -568,4 +597,21 @@ body {
   #calendar {
     width: 100%;
     height: 300px;
+  }
+
+  #interactive-div{
+    display:flex;
+    flex-wrap:wrap;
+    padding:4px;
+  }
+
+  #interactive-div table{
+    border:1px solid;
+    margin:4px;
+    width:25%;
+  }
+
+  #interactive-div td {
+    border:1px solid;
+    margin:2px;
   }

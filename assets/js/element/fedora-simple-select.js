@@ -64,7 +64,7 @@ class FedoraSelect {
         }
     }
 
-    getId(){
+    getId() {
         return this.#uts;
     }
 
@@ -72,6 +72,10 @@ class FedoraSelect {
         this.#select.style.display = 'block';
         let el = document.getElementsByClassName(`fedora-select-${this.#uts}`)[0];
         el.parentNode.removeChild(el);
+    }
+
+    restore() {
+
     }
 
     add(options) {
@@ -301,7 +305,7 @@ class FedoraSelect {
             font-size:14px;
           }
         
-          .fedora-select-options-${this.#uts} li {
+          .fedora-select-options-${this.#uts} > li {
             height:24px;
             padding: 4px;
             cursor: pointer;
@@ -323,11 +327,11 @@ class FedoraSelect {
           }`;
 
         if (document.getElementsByTagName("style").length > 0) {
-            document.getElementsByTagName("style")[0].innerHTML = document.getElementsByTagName("style")[0].innerHTML + this.stylesheet;
+            document.getElementsByTagName("style")[0].innerHTML = document.getElementsByTagName("style")[0].innerHTML + stylesheet;
         } else {
             var style_node = document.createElement('style');
             style_node.innerHTML = stylesheet;
-            document.getElementsByTagName("head")[0].appendChild(style_node);
+            document.head.appendChild(style_node);
         }
 
         let fonts_0 = document.createElement("link");

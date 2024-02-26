@@ -23,20 +23,22 @@
   <body>
     <div class="ffb-container">
       <div>
-        <ul class="form-edit-tabs" id="form-tabs">
+        <ul class="prs-tab">
           <li to="tab-elements">Araçlar</li>
           <li to="tab-edit">Düzenle</li>
           <li to="tab-general">Genel</li>
         </ul>
-        <div class="tabs" id="tab-elements">
+
+        <div class="prs-tabs" id="tab-elements">
           <ul class="ffb-elements" id="elements"></ul>
         </div>
-        <div class="tabs" id="tab-edit">
+
+        <div class="prs-tabs" id="tab-edit">
           <ul class="ffb-elements">
             <div class="form-component" id="edit-component"></div>
           </ul>
         </div>
-        <div class="tabs" id="tab-general">
+        <div class="prs-tabs" id="tab-general">
           <div class="form-component">
             <div class="form-editor">
               <label> Form adı </label>
@@ -80,22 +82,30 @@
         </div>
       </div>
       <div>
-        <ul class="form-edit-tabs" id="form-tabs2">
+        <ul class="prs-tab">
           <li to="tab2-edit">Düzenleme</li>
           <li to="tab2-preview">Önizleme</li>
+          <li to="tab2-interactive">Interaktif</li>
         </ul>
-        <div class="tabs" id="tab2-edit">
+        <div class="prs-tabs" id="tab2-interactive">
+          <div id="interactive-div"></div>
+        </div>
+        <div class="prs-tabs" id="tab2-edit">
           <ul class="ffb-elements" id="preview"></ul>
         </div>
-        <div class="tabs" id="tab2-preview">ÖNİZLEME</div>
+        <div class="prs-tabs" id="tab2-preview">ÖNİZLEME</div>
       </div>
     </div>
+
+    <script src="assets/js/element/prs-tab.js"></script>
 
     <script src="assets/js/dragula.js"></script>
     <script src="assets/js/hint.js"></script>
 
     <script src="assets/js/form-utils.js"></script>
     <script src="assets/js/form_elements.js"></script>
+    <script src="assets/js/form-builder.js"></script>
+
     <script src="assets/js/quill.js"></script>
     <script src="assets/js/moment.min.js"></script>
     <script src="assets/js/rome.min.js"></script>
@@ -113,7 +123,12 @@
       var fedora_selects = [];
 
       // Düzenlenen form elemanları
-      var result_form = {};
+      var result_element = {};
+      var result_form = {
+        settings: {},
+        elements: {},
+        interact: {},
+      };
 
       window.addEventListener("load", () => {
         // form_elements.js içerisinden gelen
@@ -123,7 +138,7 @@
           let obj = document.createElement("li");
           // Her eleman için ikon ekliyoruz
           let img = document.createElement("img");
-          img.src = `/assets/img/elements/${el}.svg`;
+          img.src = `/assets/img/elements/${el}.svg?v=${Date.now()}`;
           // Liste içine ikonu ekledik
           obj.appendChild(img);
           // Form elemanı ismini de ikonun sonrasına ekledik
@@ -209,10 +224,11 @@
               min: false,
               max: false,
               rows: 2,
+              multiple: false,
             };
 
-            // result_form dizisine yeni eleman eklenir
-            result_form[`${uts}`] = element_object;
+            // result_element dizisine yeni eleman eklenir
+            result_element[`${uts}`] = element_object;
 
             // form_elements içerisinden elemanın
             // ["template"] değerini çekiyoruz
@@ -233,11 +249,11 @@
             // Sol üstteki butonlar
             // "SİL","ARTIR","MANUEL ARTIR","EKSİLT"
             let buttons = `
-            <button class="increase-button" id="inc-${element.id}" onclick="increaseSizeOfComponent('${element.id}',this);" disabled="">
+            <button class="increase-button" id="inc-${element.id}" onclick="changeWidth('${element.id}','inc',this);" disabled="">
               +
             </button>
-            <input type="number" class="width-input no-spin" min="20" max="100" step="10" onclick="this.select();" onblur="changeWidth('${element.id}',this);" id="width-${element.id}" value="100" />
-            <button class="decrease-button" id="dec-${element.id}" onclick="decreaseSizeOfComponent('${element.id}',this);">
+            <input type="number" class="width-input no-spin" min="20" max="100" step="10" onclick="this.select();" onblur="changeWidth('${element.id}',this.value,this);" id="width-${element.id}" value="100" />
+            <button class="decrease-button" id="dec-${element.id}" onclick="changeWidth('${element.id}','dec',this);">
               -
             </button>
             <button class="cancel-button" onclick="deleteComponent('${element.id}');">
@@ -288,7 +304,7 @@
                   defaultElement.type = "text";
                   rome(defaultElement, {
                     weekStart: 0,
-                    time: false
+                    time: false,
                   });
                   break;
                 case "datetime":
@@ -310,8 +326,6 @@
 
             // Required değeri hem editor, hem editables alanında bu metod ile güncellenecektir
             changeRequire(`${uts}`, { checked: element_object["required"] });
-            // Önizleme metodu, her form işleminden sonra çalışacaktır
-            // preview();
           }
           // Sıralama metodu
           // bırakma işleminde her zaman çalışacaktır
@@ -320,7 +334,7 @@
         })
         .on("remove", (el, container, source) => {
           document.getElementById("edit-component").innerHTML = "";
-          tabs1.change("tab-elements");
+          tabs.change("tab-elements");
           selected_element = null;
         });
 
@@ -337,23 +351,17 @@
           let id = element.id.split("-")[2];
           // Bulunan id değerine sahip listenin "order" değerini
           // o anki sayaç değerine güncelle
-          result_form[`${id}`]["order"] = cnt;
+          result_element[`${id}`]["order"] = cnt;
           // sayacı artır
           cnt++;
         });
+        // Önizleme metodu
+        rebuild();
       }
 
-      // TODO : Preview metodu
-      // build.html içerisindeki şekilde build etmek üzere düzenlenecek
-      function preview() {
-        var lis = document.getElementById("preview").childNodes;
-        preview_tab = document.getElementById("tab2-preview");
-        preview_tab.innerHTML = "";
-        lis.forEach((element) => {
-          var add_form =
-            element.getElementsByClassName("form-component")[0].innerHTML;
-          preview_tab.innerHTML = preview_tab.innerHTML + add_form;
-        });
+      function rebuild() {
+        document.getElementById("tab2-preview").innerHTML = "";
+        new FedoraFormBuilder("tab2-preview", result_element);
       }
 
       // Form elemanı seçim metodu
@@ -375,7 +383,7 @@
           el.classList.add("select-for-edit");
           // Seçim işlemi gerçekleştikten sonra
           // otomatik "Düzenleme" tabını aktif ettik
-          tabs1.change("tab-edit");
+          tabs.change("tab-edit");
           // selected_element'i tıklanan elemente eşitledik
           selected_element = el;
           // "Düzenleme" tabı içerisindeki editable alanları render ettik
@@ -399,86 +407,30 @@
         // sonrasında ise selectForEdit() çalışıyor
         setTimeout(() => {
           document.getElementById("edit-component").innerHTML = "";
-          tabs1.change("tab-elements");
+          tabs.change("tab-elements");
           selected_element = null;
         }, 2);
       }
-
-      // Form elemanı yatay genişlik artırma
-      function increaseSizeOfComponent(id, el) {
-        // Form elemanı en dışı seçildi yani liste
-        let li = document.getElementById(`${id}`);
-        // width değeri eğer mevcut width değeri
-        //  '100' değerinden küçük ise +10 eklenerek güncellendi
-        // değilse yani '100' veya fazlası ise mevcut değerinde kaldı ve güncellenmedi
-        li.style.width =
-          li.style.width.split("%")[0] < 100
-            ? `${parseInt(li.style.width.split("%")[0]) + 10}%`
-            : li.style.width;
-
-        // Eğer yeni değer "100%" oldu ise
-        if (li.style.width == "100%") {
-          // Artırma butonunu disabled yapıyoruz
-          el.setAttribute("disabled", "");
-          // Azaltma butonunu enabled yapıyoruz
-          document.getElementById(`dec-${id}`).removeAttribute("disabled");
-        }
-
-        // Eğer yeni değer "20%"den büyük ise
-        if (li.style.width.split("%")[0] > 20) {
-          // Azaltma butonunu enabled yapıyoruz
-          document.getElementById(`dec-${id}`).removeAttribute("disabled");
-        }
-
-        // width input değerini ise tekrar güncelliyoruz
-        let width_input = document.getElementById(`width-${id}`);
-        width_input.value = li.style.width.replace("%", "");
-
-        // TODO : Width güncellemesi editable alanındaki input için de yapılacak.
-      }
-
-      // Şarkı önerisi
-      // https://www.youtube.com/watch?v=SsKT0s5J8ko
-
-      // Form elemanı yatay genişlik azaltma
-      // increaseSizeOfComponent() benzer mantıkta çalışır
-      function decreaseSizeOfComponent(id, el) {
-        let li = document.getElementById(`${id}`);
-        li.style.width =
-          li.style.width.split("%")[0] > 20
-            ? `${parseInt(li.style.width.split("%")[0]) - 10}%`
-            : li.style.width;
-        if (li.style.width == "20%") {
-          el.setAttribute("disabled", "");
-          document.getElementById(`inc-${id}`).removeAttribute("disabled");
-        }
-
-        if (li.style.width.split("%")[0] < 100) {
-          document.getElementById(`inc-${id}`).removeAttribute("disabled");
-        }
-
-        let width_input = document.getElementById(`width-${id}`);
-        width_input.value = li.style.width.replace("%", "");
-        // TODO : Width güncellemesi editable alanındaki input için de yapılacak.
-      }
+      // * Şarkı önerisi
+      // * https://www.youtube.com/watch?v=SsKT0s5J8ko
 
       // Change minimum func
       function changeMin(id, el) {
-        if (el.value == "") result_form[`${id}`]["min"] = false;
-        else result_form[`${id}`]["min"] = el.value;
+        if (el.value == "") result_element[`${id}`]["min"] = false;
+        else result_element[`${id}`]["min"] = el.value;
       }
 
       // Change max func
       function changeMax(id, el) {
-        if (el.value == "") result_form[`${id}`]["max"] = false;
-        else result_form[`${id}`]["max"] = el.value;
+        if (el.value == "") result_element[`${id}`]["max"] = false;
+        else result_element[`${id}`]["max"] = el.value;
       }
 
       // Change element's attribute
       function changeAttr(id, el) {
         // Component attr değeri güncellenir
-        result_form[`${id}`]["attr"] = el.value.trim();
-        result_form[`${id}`]["attr"].split(" ").forEach((attr) => {
+        result_element[`${id}`]["attr"] = el.value.trim();
+        result_element[`${id}`]["attr"].split(" ").forEach((attr) => {
           if (attr.includes("="))
             document
               .getElementById(`real-component-${id}`)
@@ -492,24 +444,26 @@
 
       // Change rows in textarea
       function changeRows(id, el) {
-        result_form[`${id}`]["rows"] = el.value.trim();
+        result_element[`${id}`]["rows"] = el.value.trim();
         document
           .getElementById(`real-component-${id}`)
-          .setAttribute("rows", result_form[`${id}`]["rows"]);
+          .setAttribute("rows", result_element[`${id}`]["rows"]);
       }
 
       // TODO Multiple func
-      function changeMultiple(id, el) {}
+      function changeMultiple(id, el) {
+        result_form[`${id}`].multiple = true;
+      }
 
       // Change endpoint
       function changeEndpoint(id, el) {
-        result_form[`${id}`]["endpoint"] = false;
+        result_element[`${id}`]["endpoint"] = false;
         let input_type = selected_element
           .querySelectorAll(`#real-component-${id}`)[0]
           .tagName.toLowerCase();
         switch (input_type) {
           case "select":
-            result_form[`${id}`]["endpoint"] = el.value;
+            result_element[`${id}`]["endpoint"] = el.value;
             break;
         }
       }
@@ -520,7 +474,7 @@
           ".endpoint-error-message"
         )[0];
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", result_form[`${id}`]["endpoint"], true);
+        xhr.open("GET", result_element[`${id}`]["endpoint"], true);
         xhr.onload = function () {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
@@ -561,16 +515,82 @@
         xhr.send();
       }
 
-      // Width değişikliği olduğunda tetiklenen metod
-      function changeWidth(id, el) {
-        el.value = roundToTen(el.value, 20, 100, 10);
-        let li = document.getElementById(`${id}`);
-        li.style.width = `${el.value}%`;
-        // TODO : Hem quick actions hem de editable alanındaki width değerlerini güncelle
+      function changeWidth(li_id, value, elem) {
+        let li = document.getElementById(li_id);
+        if (li == null) {
+          Array.from(
+            document.getElementById("preview").querySelectorAll("li")
+          ).forEach((elem) => {
+            if (elem.id.includes(li_id)) {
+              li_id = elem.id;
+              li = document.getElementById(li_id);
+            }
+          });
+        }
+
+        value = `${value}`;
+        if (value == "dec") {
+          value = roundToTen(
+            parseInt(li.style.width.replace("%", "")) - 20,
+            20,
+            100,
+            10
+          );
+          if (value < "20") {
+            value = "20";
+          }
+        } else if (value == "inc") {
+          value = roundToTen(
+            parseInt(li.style.width.replace("%", "")) + 20,
+            20,
+            100,
+            10
+          );
+          if (value > "100") {
+            value = "100";
+          }
+        } else {
+          value = roundToTen(value.replace("%", ""), 20, 100, 10);
+        }
+
+        li.style.width = `${value}%`;
+
+        // Eğer yeni değer "20%"den büyük ise
+        if (li.style.width.replace("%", "") == 100) {
+          // Artırma butonunu disabled yapıyoruz
+          selected_element
+            .querySelector(`#inc-${li_id}`)
+            .setAttribute("disabled", "");
+        } else if (
+          li.style.width.replace("%", "") > 20 &&
+          li.style.width.replace("%", "") < 100
+        ) {
+          // Artırma butonunu enabled yapıyoruz
+          selected_element
+            .querySelector(`#inc-${li_id}`)
+            .removeAttribute("disabled");
+          // Azaltma butonunu enabled yapıyoruz
+          selected_element
+            .querySelector(`#dec-${li_id}`)
+            .removeAttribute("disabled");
+        } else if (li.style.width.replace("%", "") == 20) {
+          // Azaltma butonunu disabled yapıyoruz
+          selected_element
+            .querySelector(`#dec-${li_id}`)
+            .setAttribute("disabled", "");
+        }
+
+        // width input değerini ise tekrar güncelliyoruz
+        let width_input = document.getElementById(`width-${li_id}`);
+        let width2_input = document.getElementById(`width2-${li_id}`);
+        width_input.value = li.style.width.replace("%", "");
+        width2_input.value = li.style.width.replace("%", "");
       }
 
       // Component Edit Functions
       function addOption(id, text, value) {
+        if (text.trim() == "" || value.trim() == "") return;
+
         let ao_table;
         let new_option = new Option(text, value);
 
@@ -602,7 +622,7 @@
 
       // Select tipi alanlar için changeDefault
       function selectDefault(id, value) {
-        result_form[`${id}`]["default"] = value;
+        result_element[`${id}`]["default"] = value;
         document.getElementById(`real-component-${id}`).value = value;
         refreshOptionTable(id);
       }
@@ -687,7 +707,7 @@
               opts.forEach((element) => {
                 let is_selected =
                   element.querySelectorAll("td")[2].textContent.trim() ==
-                  result_form[`${id}`]["default"]
+                  result_element[`${id}`]["default"]
                     ? "selected"
                     : "";
                 document.getElementById(`real-component-${id}`).innerHTML =
@@ -701,7 +721,7 @@
             });
           } catch (err) {}
 
-          result_form[`${id}`]["options"] = document.getElementById(
+          result_element[`${id}`]["options"] = document.getElementById(
             `real-component-${id}`
           ).innerHTML;
 
@@ -720,7 +740,7 @@
           fedora_selects.push(
             new FedoraSelect(`#real-component-${id}`, {
               search: true,
-              placeholder: result_form[`${id}`]["placeholder"],
+              placeholder: result_element[`${id}`]["placeholder"],
               width: "100%",
               custom_id: `${id}`,
             })
@@ -748,7 +768,7 @@
               "none";
           }
           // Sonuç istenen id'ye sahip form elemanı bulunup güncellenir
-          result_form[id]["required"] = el.checked;
+          result_element[id]["required"] = el.checked;
         }
       }
 
@@ -757,7 +777,7 @@
         // Direkt option değerlerini alacaktır
         // 0 - 1 - 2 - 3
         // Aktif - Pasif - Ekle - Düzenle
-        result_form[`${id}`]["condition"] = el.value;
+        result_element[`${id}`]["condition"] = el.value;
       }
 
       // Etiket değiştirme metodu
@@ -772,7 +792,7 @@
           document.getElementById(`component-label-${id}`).innerHTML =
             el.value.trim();
           // Sonuç istenen id'ye sahip form elemanı bulunup güncellenir
-          result_form[id]["label"] = el.value.trim();
+          result_element[id]["label"] = el.value.trim();
         }
       }
 
@@ -796,7 +816,7 @@
             document.getElementById(`helptext-button-${id}`).style.display =
               "block";
             // Form elemanı içerisindeki değeri de güncelliyoruz
-            result_form[`${id}`]["helptext"] = el.value.trim();
+            result_element[`${id}`]["helptext"] = el.value.trim();
           } else {
             // data-hint attribute'ünü siliyoruz
             document
@@ -806,7 +826,7 @@
             document.getElementById(`helptext-button-${id}`).style.display =
               "none";
             // Form elemanı içerisindeki değeri de güncelliyoruz
-            result_form[`${id}`]["helptext"] = "";
+            result_element[`${id}`]["helptext"] = "";
           }
         }
       }
@@ -819,7 +839,7 @@
           .getElementById(`form-component-${id}`)
           .setAttribute("class", el.value.trim());
         // Form elemanında da güncelleme sağladık
-        result_form[`${id}`]["class"] = el.value.trim();
+        result_element[`${id}`]["class"] = el.value.trim();
       }
 
       // Placeholder değeri güncelleme metodu
@@ -829,7 +849,7 @@
           .getElementById(`real-component-${id}`)
           .setAttribute("placeholder", el.value.trim());
         // Form elemanında da güncelleme sağladık
-        result_form[`${id}`]["placeholder"] = el.value.trim();
+        result_element[`${id}`]["placeholder"] = el.value.trim();
       }
 
       // CSS direkt input'a uygulanacaktır
@@ -846,7 +866,7 @@
           .getElementById(`real-component-${id}`)
           .setAttribute("style", up_css);
         // Form elemanında da güncelleme sağladık
-        result_form[`${id}`]["css"] = up_css;
+        result_element[`${id}`]["css"] = up_css;
       }
 
       // name değeri güncelleme
@@ -861,15 +881,15 @@
           document.getElementsByClassName("name-error-message")[0].textContent =
             "";
           // Form elemanı değeri de güncellenir
-          result_form[`${id}`]["name"] = name.trim();
-          // result_form içerisindeki tüm elemanlar
+          result_element[`${id}`]["name"] = name.trim();
+          // result_element içerisindeki tüm elemanlar
           // yani eklenmiş tüm form elemanları döndürülür
-          Object.keys(result_form).forEach((el) => {
+          Object.keys(result_element).forEach((el) => {
             // Dönen eleman mevcut eleman ile aynı değilse
             if (el != id) {
               // name değerlerini karşılaştır
               // girilen name değeri ile aynı değer daha önce girildiyse
-              if (result_form[el]["name"] == name) {
+              if (result_element[el]["name"] == name) {
                 // name-error-message hatası eklendi
                 document.getElementsByClassName(
                   "name-error-message"
@@ -890,15 +910,15 @@
         // Regex ifadesi boş değil ise
         if (el.value.trim() != "") {
           // Yeni regex değeri geldiyse ve validation son değeri 'false' ise
-          if (result_form[`${id}`]["validation"] == false) {
+          if (result_element[`${id}`]["validation"] == false) {
             // boş nesneye dönüştür
-            result_form[`${id}`]["validation"] = {};
+            result_element[`${id}`]["validation"] = {};
           }
           // Regex ifadesini içeriye yerleştir
-          result_form[`${id}`]["validation"]["regex"] = el.value;
+          result_element[`${id}`]["validation"]["regex"] = el.value;
           // Boşsa validation false değerine düşecektir
         } else {
-          result_form[`${id}`]["validation"] = false;
+          result_element[`${id}`]["validation"] = false;
         }
       }
 
@@ -907,7 +927,9 @@
         // Girilen ifade çekilir
         const inputValue = el.value;
         // Regex çekilir ve Regex() nesnesine dönüştürülür
-        const regex = new RegExp(result_form[`${id}`]["validation"]["regex"]);
+        const regex = new RegExp(
+          result_element[`${id}`]["validation"]["regex"]
+        );
 
         // ifade ile girilen değer uyuyor mu kontrol edilir
         if (regex.test(inputValue)) {
@@ -939,37 +961,37 @@
             // checkbox tipinde ise
             case "checkbox":
               // checked değerini güncelledik
-              result_form[id]["default"] = el.checked;
+              result_element[id]["default"] = el.checked;
               document.getElementById(`real-component-${id}`).checked =
-                result_form[id]["default"];
+                result_element[id]["default"];
               break;
 
             default:
               // Diğer durumlar genelde value ile çalışıyor
               // bu yüzden switch default case'i bu şekilde kalabilir
               // Özel durumlar üste eklenmeye devam edecektir
-              result_form[id]["default"] = el.value;
+              result_element[id]["default"] = el.value;
               document.getElementById(`real-component-${id}`).value =
-                result_form[id]["default"];
+                result_element[id]["default"];
               break;
           }
         } else if (tag == "div") {
-          result_form[id]["default"] = el.innerHTML;
+          result_element[id]["default"] = el.innerHTML;
           document.getElementById(`real-component-${id}`).innerHTML =
-            result_form[id]["default"];
+            result_element[id]["default"];
         }
       }
 
       // Validation mesajı güncelleme
       function changeValidationMessage(id, el) {
         // Eğer regex ifade tanımlı ise
-        if (result_form[`${id}`]["validation"]["regex"] != undefined) {
+        if (result_element[`${id}`]["validation"]["regex"] != undefined) {
           // Girilen değer boş değil ise
           if (el.value.trim() != "") {
             // Yeni değeri tanımla
-            result_form[`${id}`]["validation"]["error"] = el.value;
+            result_element[`${id}`]["validation"]["error"] = el.value;
           } else {
-            result_form[`${id}`]["validation"]["error"] = "";
+            result_element[`${id}`]["validation"]["error"] = "";
           }
         }
       }
@@ -988,45 +1010,46 @@
 
         // Ilgili editable için mevcut değerleri çektik
         let condition_selection = `condition_selected_${
-          result_form[`${el_id}`]["condition"]
+          result_element[`${el_id}`]["condition"]
         }`;
         let render_obj = {
-          required: result_form[`${el_id}`]["required"] ? 'checked=""' : "",
+          required: result_element[`${el_id}`]["required"] ? 'checked=""' : "",
           id: el_id,
-          label: result_form[`${el_id}`]["label"].trim(),
+          label: result_element[`${el_id}`]["label"].trim(),
           helptext:
-            result_form[`${el_id}`]["helptext"] == false
+            result_element[`${el_id}`]["helptext"] == false
               ? ""
-              : result_form[`${el_id}`]["helptext"],
-          css: result_form[`${el_id}`]["css"],
-          class: result_form[`${el_id}`]["class"],
-          attr: result_form[`${el_id}`]["attr"],
-          placeholder: result_form[`${el_id}`]["placeholder"],
-          name: result_form[`${el_id}`]["name"],
-          default: result_form[`${el_id}`]["default"],
+              : result_element[`${el_id}`]["helptext"],
+          css: result_element[`${el_id}`]["css"],
+          class: result_element[`${el_id}`]["class"],
+          attr: result_element[`${el_id}`]["attr"],
+          placeholder: result_element[`${el_id}`]["placeholder"],
+          name: result_element[`${el_id}`]["name"],
+          default: result_element[`${el_id}`]["default"],
           regex:
-            result_form[`${el_id}`]["validation"]["regex"] != undefined
-              ? result_form[`${el_id}`]["validation"]["regex"]
+            result_element[`${el_id}`]["validation"]["regex"] != undefined
+              ? result_element[`${el_id}`]["validation"]["regex"]
               : "",
           error:
-            result_form[`${el_id}`]["validation"]["error"] != undefined
-              ? result_form[`${el_id}`]["validation"]["error"]
+            result_element[`${el_id}`]["validation"]["error"] != undefined
+              ? result_element[`${el_id}`]["validation"]["error"]
               : "",
           min:
-            result_form[`${el_id}`]["min"] == false
+            result_element[`${el_id}`]["min"] == false
               ? ""
-              : result_form[`${el_id}`]["min"],
+              : result_element[`${el_id}`]["min"],
           max:
-            result_form[`${el_id}`]["max"] == false
+            result_element[`${el_id}`]["max"] == false
               ? ""
-              : result_form[`${el_id}`]["max"],
+              : result_element[`${el_id}`]["max"],
           endpoint:
-            result_form[`${el_id}`]["endpoint"] != false
-              ? result_form[`${el_id}`]["endpoint"]
+            result_element[`${el_id}`]["endpoint"] != false
+              ? result_element[`${el_id}`]["endpoint"]
               : "",
-          width: result_form[`${el_id}`]["width"],
-          rows: result_form[`${el_id}`]["rows"],
-          multiple: result_form[`${el_id}`]["multiple"] ? 'checked=""' : "",
+          width: result_element[`${el_id}`]["width"].replace("%", ""),
+          width_id: `width2-${el.id}`,
+          rows: result_element[`${el_id}`]["rows"],
+          multiple: result_element[`${el_id}`]["multiple"] ? 'checked=""' : "",
         };
         render_obj[`${condition_selection}`] = "selected";
 
@@ -1042,7 +1065,7 @@
           // temizledik
           try {
             for (let j = 0; j < 3; j++) {
-              if (result_form[`${el_id}`]["condition"] != j)
+              if (result_element[`${el_id}`]["condition"] != j)
                 edit_component.innerHTML = document
                   .getElementById("edit-componenet")
                   .innerHTML.replaceAll(`{{condition_selected_${j}}}`, "");
@@ -1055,10 +1078,21 @@
         } catch (err) {}
 
         try {
+          renderQuillEditor();
+        } catch (err) {}
+
+        rebuild();
+      }
+
+      function renderQuillEditor() {
+        try {
           let my_editor = new Quill(".editor-default", {
             theme: "snow",
             height: "200px",
           });
+        } catch (err) {}
+
+        try {
           my_editor.on("text-change", () => {
             changeDefault(
               el_id,
@@ -1068,71 +1102,95 @@
         } catch (err) {}
       }
 
-      // FedoraTab library
-      class FedoraTab {
-        #tabs;
+      function renderInteractive() {
+        let interactives = document.getElementById("interactive-div");
+        interactives.innerHTML = "";
 
-        constructor(id) {
-          this.#find_and_select(id);
-        }
+        let lis = Array.from(
+          document.getElementById("preview").querySelectorAll("li")
+        );
 
-        #find_and_select(id) {
-          this.#tabs = document.getElementById(id).getElementsByTagName("li");
-          let not_selected = true;
-          for (let i = 0; i < this.#tabs.length; i++) {
-            document.getElementById(
-              this.#tabs[i].getAttribute("to")
-            ).style.display = "none";
-            const self = this;
-            this.#tabs[i].addEventListener("click", () => {
-              self.select(this.#tabs[i]);
-            });
-            let classes = this.#tabs[i].classList;
-            for (let j = 0; j < classes.length; j++) {
-              if (classes[j] == "selected")
-                document.getElementById(
-                  this.#tabs[i].getAttribute("to")
-                ).style.display = "block";
+        lis.forEach((element) => {
+          let id = element.id.split("-")[2];
+          let elem = document.getElementById(`real-component-${id}`);
+
+          if (elem != null) {
+            if (elem.tagName.toLowerCase() == "select") {
+              let interact_table = document.createElement("table");
+              let _t_head = document.createElement("thead");
+              let interact_header = document.createElement("tr");
+
+              let element_name = document.createElement("td");
+              element_name.innerHTML = `${result_element[`${id}`]["name"]}`;
+              interact_header.appendChild(element_name);
+
+              let options = Array.from(elem.querySelectorAll("option"));
+              let options_ok = false;
+              if (options.length > 0) {
+                options.forEach((option) => {
+                  let option_content = document.createElement("td");
+                  option_content.innerHTML = `${option.textContent.trim()}`;
+                  interact_header.appendChild(option_content);
+                });
+                _t_head.appendChild(interact_header);
+                interact_table.appendChild(_t_head);
+
+                lis.forEach((element_) => {
+                  let element_id = element_.id.split("-")[2];
+
+                  if (element_id != id && element_id != undefined) {
+                    let interact_row = document.createElement("tr");
+                    let interact_column = document.createElement("td");
+                    interact_column.innerHTML = `${
+                      result_element[`${element_id}`]["name"]
+                    }`;
+                    interact_row.appendChild(interact_column);
+
+                    for (let i = 0; i < options.length; i++) {
+                      let interact_column_ = document.createElement("td");
+                      let _select = `
+                                <select onchange="setInteract('${element_id}','${options[i].value}',this.value);">
+                                        <option selected="" value="-"></option>
+                                        <option value="1">Göster</option>
+                                        <option value="0">Gizle</option>
+                                        <option value="2">Zorunlu</option>
+                                </select>
+                              `;
+                      interact_column_.innerHTML =
+                        interact_column_.innerHTML + _select;
+                      interact_row.appendChild(interact_column_);
+                      interact_table.appendChild(interact_row);
+                    }
+                  }
+                });
+              }
+
+              interactives.appendChild(interact_table);
             }
           }
-          if (not_selected) {
-            document.getElementById(
-              this.#tabs[0].getAttribute("to")
-            ).style.display = "block";
-            this.#tabs[0].classList.add("selected");
-          }
-        }
+        });
+      }
 
-        select(el) {
-          for (let i = 0; i < this.#tabs.length; i++) {
-            this.#tabs[i].classList.remove("selected");
-            document.getElementById(
-              this.#tabs[i].getAttribute("to")
-            ).style.display = "none";
-          }
-          el.classList.add("selected");
-          document.getElementById(el.getAttribute("to")).style.display =
-            "block";
+      function setInteract(element, option, value) {
+        if (result_form["interact"][`${element}`] == undefined) {
+          result_form["interact"][`${element}`] = {};
         }
-
-        change(tab) {
-          let el = document.getElementById(tab);
-          let selected_tab;
-          for (let i = 0; i < this.#tabs.length; i++) {
-            this.#tabs[i].classList.remove("selected");
-            document.getElementById(
-              this.#tabs[i].getAttribute("to")
-            ).style.display = "none";
-            if (this.#tabs[i].getAttribute("to") == tab)
-              selected_tab = this.#tabs[i];
-          }
-          selected_tab.classList.add("selected");
-          el.style.display = "block";
+        result_form["interact"][`${element}`][`${option}`] = value;
+        if (value == "-") {
+          delete result_form["interact"][`${element}`];
         }
       }
 
-      const tabs1 = new FedoraTab("form-tabs");
-      const tabs2 = new FedoraTab("form-tabs2");
+      function buildForm() {
+        result_form.elements = result_element;
+        return result_form;
+      }
+
+      // Form build işleminde validator sınıfı olacak ve her element için validation'ların tamamına bakacak : min,max,validation regex
+      // " " interaction sınıfı olacak ve interactionları kontrol edip durumları gerçekleştirecek
+      // Submit sınıfı içerisinde de alanlar validate, interact kontrolleri tamamlanıp submit edilebilir hale getirilecek
+
+      var tabs = new ProdseenTab();
     </script>
   </body>
 </html>

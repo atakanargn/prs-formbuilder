@@ -1,16 +1,13 @@
 var ffb;
 
-window.addEventListener("load", () => {
-    ffb = new FedoraFormBuilder("build", test_form);
-});
-
 class FedoraFormBuilder {
     #form_object = [];
+    #form_element;
 
     constructor(id, form_object) {
+        this.#form_element = document.getElementById(id);
         const sortedData = Object.values(form_object).sort((a, b) => a.order - b.order);
         this.#form_object = sortedData;
-        console.log(this.#form_object)
         this.#build_form(this.#form_object);
     }
 
@@ -21,23 +18,16 @@ class FedoraFormBuilder {
     #build_form(form_object) {
         for (let i = 0; i < form_object.length; i++) {
             let element = form_object[i];
-            console.log(element)
             this.#build_element(element);
         }
     }
 
     #build_element(element_object) {
         let new_element;
-        new_element = replaceAll(form_elements[element_object.type]["template"], "{{id}}", element_object.cid);
-        new_element = replaceAll(new_element, "{{label}}", element_object.label);
-        new_element = replaceAll(new_element, "{{helptext}}", element_object.helptext ? element_object.helptext : "");
-        new_element = replaceAll(new_element, "{{helptext_visible}}", `display:${element_object.helptext ? "block" : "none"};`);
-        new_element = replaceAll(new_element, "{{width}}", element_object.width);
-        new_element = replaceAll(new_element,"{{required}}", `display:${element_object.required ? "block" : "none"};`);
-        new_element = replaceAll(new_element,"{{name}}",element_object.name);
+        new_element = render_curly_brackets(element_object,form_elements[element_object.type]["template"])
 
         // Elemanı ekle
-        document.getElementById("build").innerHTML = document.getElementById("build").innerHTML + new_element;
+        this.#form_element.innerHTML = this.#form_element.innerHTML + new_element;
 
 
         switch (element_object.type) {
