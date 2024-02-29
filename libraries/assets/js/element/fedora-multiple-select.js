@@ -6,7 +6,7 @@ class FedoraSelect {
     #searchInput;
     #optionsList;
     #multipleselect;
-    #selectedList={};
+    #selectedList = {};
 
     constructor(
         id,
@@ -22,7 +22,7 @@ class FedoraSelect {
 
         this.#select = document.getElementById(id.replace("#", ""));
         this.#select.style.display = 'none';
-        this.#select.setAttribute("multiple","");
+        this.#select.setAttribute("multiple", "");
 
         const customSelect = document.createElement('div');
         customSelect.classList.add(`fedora-select-${this.#uts}`);
@@ -197,7 +197,7 @@ class FedoraSelect {
             imagesrc = document.createElement("img")
             imagesrc.src = image;
             span.appendChild(imagesrc);
-        }else{
+        } else {
             image = "";
         }
 
@@ -208,7 +208,7 @@ class FedoraSelect {
         span.addEventListener("click", (event) => {
             this.add({ text: text, image: image, value: value });
             this.#selectedList = this.#selectedList.filter(option => option.text !== text);
-            this.#multipleselect.removeChild(span);
+            span.remove();
             this.#add_options();
         });
 
@@ -297,7 +297,7 @@ class FedoraSelect {
             const selectOption = document.createElement("option");
             selectOption.textContent = optionData.text;
             selectOption.value = optionData.value;
-            selectOption.setAttribute("selected","");
+            selectOption.setAttribute("selected", "");
             this.#select.appendChild(selectOption);
         }
     }
@@ -305,7 +305,7 @@ class FedoraSelect {
     #clean_options_list() {
         this.#select.innerHTML = '';
         this.#optionsList.querySelectorAll("li").forEach((element) => {
-            this.#optionsList.removeChild(element)
+            element.remove();
         });
     }
 

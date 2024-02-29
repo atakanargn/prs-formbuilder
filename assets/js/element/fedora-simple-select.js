@@ -70,8 +70,8 @@ class FedoraSelect {
 
     destroy() {
         this.#select.style.display = 'block';
-        let el = document.getElementsByClassName(`fedora-select-${this.#uts}`)[0];
-        el.parentNode.removeChild(el);
+        const el = document.getElementsByClassName(`fedora-select-${this.#uts}`)[0];
+        el.remove();
     }
 
     restore() {

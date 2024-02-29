@@ -24,7 +24,7 @@ var form_elements = {
                 </label>
             </div>
         `,
-        editor: ["required", "label", "help-text","width", "hr", "condition", "name", "checkbox-default"],
+        editor: ["required", "label", "help-text", "width", "hr", "condition", "name", "checkbox-default"],
         default: "checked"
     },
     textarea: {
@@ -63,13 +63,11 @@ var form_elements = {
                 <label id="component-label-{{id}}" class="form-edit-label" style="float:left;margin-right:4px;">{{label}}</label>
                 <button id="helptext-button-{{id}}" data-hint="{{helptext}}" class="helptext-button" style="{{helptext_visible}}float:left;">?</button>
                 <span id="component-required-{{id}}" class="comp-required" style="{{required}}margin-right:4px;">*</span>
-                <select id="real-component-{{id}}">
-
-                </select>
+                <select id="real-component-{{id}}"></select>
             </div>
         `,
         default: "0",
-        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "multiple","select-options", "endpoint"]
+        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "multiple", "select-options", "endpoint"]
     },
     "float": {
         "name": "Sayı",
@@ -126,7 +124,7 @@ var form_elements = {
     </div>
     `,
         default: formatDate(Date.now()),
-        editor:["required","label", "help-text","class","css","hr","condition","name","hr","default"]
+        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "default"]
     },
     "datetime": {
         "name": "Tarih Saat",
@@ -138,7 +136,7 @@ var form_elements = {
     </div>
     `,
         default: formatDate(Date.now()),
-        editor:["required","label", "help-text","class","css","hr","condition","name","hr","default"]
+        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "default"]
     },
     "time": {
         "name": "Saat",
@@ -150,7 +148,7 @@ var form_elements = {
     </div>
     `,
         default: formatDate(Date.now()),
-        editor:["required","label", "help-text","class","css","hr","condition","name","hr","default"]
+        editor: ["required", "label", "help-text", "class", "css", "hr", "condition", "name", "hr", "default"]
     },
     "table": {
         "name": "Tablo",
