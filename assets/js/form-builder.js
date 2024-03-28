@@ -1,6 +1,6 @@
 var ffb;
 
-class FedoraFormBuilder {
+class ProdseenFormBuilder {
     #form_object = [];
     #form_element;
 
@@ -24,7 +24,7 @@ class FedoraFormBuilder {
 
     #build_element(element_object) {
         let new_element;
-        new_element = render_curly_brackets(element_object,form_elements[element_object.type]["template"])
+        new_element = render_curly_brackets(element_object, form_elements[element_object.type]["template"])
 
         // Elemanı ekle
         this.#form_element.innerHTML = this.#form_element.innerHTML + new_element;
@@ -32,7 +32,7 @@ class FedoraFormBuilder {
 
         switch (element_object.type) {
             case "boolean":
-                document.getElementsByName(element_object.name).checked=element_object.default;
+                document.getElementsByName(element_object.name).checked = element_object.default;
                 break;
             case "textarea":
 
@@ -47,7 +47,7 @@ class FedoraFormBuilder {
 
                 break;
         }
-        
+
     }
 }
 

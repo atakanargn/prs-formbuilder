@@ -5,7 +5,7 @@
 var selected_element;
 // For select-default
 var options_dragula;
-var fedora_selects = [];
+var prodseen_selects = [];
 
 // Düzenlenen form elemanları
 var result_element = {};
@@ -22,7 +22,7 @@ window.addEventListener("load", () => {
         // Her elemanı bir liste elemanı içerisine ekleyeceğiz
         const obj = document.createElement("li"),
             img = document.createElement("img");
-        img.src = `/assets/img/elements/${el}.svg?v=${Date.now()}`;
+        img.src = `assets/img/elements/${el}.svg?v=${Date.now()}`;
         // Liste içine ikonu ekledik
         obj.appendChild(img);
         // Form elemanı ismini de ikonun sonrasına ekledik
@@ -141,7 +141,7 @@ var drake = dragula(
               -
             </button>
             <button class="cancel-button" onclick="deleteComponent('${element.id}');">
-              <img src="/assets/img/cancel.svg" />
+              <img src="assets/img/cancel.svg" />
             </button>`;
 
             // Butonlar ve render edilmiş template birleştirildi
@@ -245,7 +245,7 @@ function reOrder() {
 
 function rebuild() {
     document.getElementById("tab2-preview").innerHTML = "";
-    new FedoraFormBuilder("tab2-preview", result_element);
+    new ProdseenFormBuilder("tab2-preview", result_element);
 }
 
 // Form elemanı seçim metodu
@@ -370,7 +370,7 @@ function testEndpoint(id, el) {
                 .tagName.toLowerCase();
             switch (input_type) {
                 case "select":
-                    fedora_selects.forEach((elem) => {
+                    prodseen_selects.forEach((elem) => {
                         if (elem.getId() == id) {
                             elem.add(jsonResponse);
                         }
@@ -601,19 +601,19 @@ function refreshOptionTable(id) {
         ).innerHTML;
 
         let index = -1;
-        fedora_selects.forEach((el) => {
+        prodseen_selects.forEach((el) => {
             if (el.getId() == id) {
                 el.destroy();
-                index = fedora_selects.indexOf(el);
+                index = prodseen_selects.indexOf(el);
             }
         });
 
         if (index > -1) {
-            fedora_selects.splice(index, 1);
+            prodseen_selects.splice(index, 1);
         }
 
-        fedora_selects.push(
-            new FedoraSelect(`#real-component-${id}`, {
+        prodseen_selects.push(
+            new ProdseenSelect(`#real-component-${id}`, {
                 search: true,
                 placeholder: result_element[`${id}`]["placeholder"],
                 width: "100%",

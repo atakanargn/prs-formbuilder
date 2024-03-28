@@ -11,13 +11,13 @@ let order, status;
 let selected = null;
 
 let test = {
-    "boolean": {
-      "type": "boolean",
-      "builder_template": `<div class="row">
+  "boolean": {
+    "type": "boolean",
+    "builder_template": `<div class="row">
       <div class="col component m-1">
         <div class="form-group mt-2 mb-2 p-0">
           <label for="input-boolean" class="form-label" >
-              <img src="./assets/img/dragdrop.svg" width="16"
+              <img src="assets/img/dragdrop.svg" width="16"
               id="component-boolean"
               draggable="true" ondragstart="dragElement(event)"
               /> Boolean
@@ -29,14 +29,14 @@ let test = {
         </div>
       </div>
     </div>`
-    },
-    "textarea": {
-      "type": "textarea",
-      "builder_template": `<div class="row">
+  },
+  "textarea": {
+    "type": "textarea",
+    "builder_template": `<div class="row">
       <div class="col component m-1">
         <div class="form-group mt-2 mb-2 p-0">
           <label for="input-textarea" class="form-label" >
-              <img src="./assets/img/dragdrop.svg" width="16"
+              <img src="assets/img/dragdrop.svg" width="16"
               id="component-textarea"
               draggable="true" ondragstart="dragElement(event)"
               /> TextArea
@@ -45,10 +45,10 @@ let test = {
         </div>
       </div>
     </div>`,
-    "preview_template":`<div class="component-edit m-1">
+    "preview_template": `<div class="component-edit m-1">
       <div class="form-group mt-2 mb-2 p-0">
         <label for="input-textarea" class="form-label" >
-            <img src="./assets/img/dragdrop.svg" width="16"
+            <img src="assets/img/dragdrop.svg" width="16"
             id="component-textarea"
             draggable="true" ondragstart="dragElement(event)"
             /> TextArea
@@ -56,13 +56,13 @@ let test = {
         <textarea class="form-control" id="input-textarea" rows="2"></textarea>
       </div>
     </div>`
-    },
-    "text": {
-      "type": "text",
-      "builder_template": `<div class="row">
+  },
+  "text": {
+    "type": "text",
+    "builder_template": `<div class="row">
       <div class="col component m-1">
         <div class="form-group mt-2 mb-2 p-0">
-          <img src="./assets/img/dragdrop.svg" width="16"
+          <img src="assets/img/dragdrop.svg" width="16"
               id="component-text"
               draggable="true" ondragstart="dragElement(event)"
               />
@@ -73,14 +73,14 @@ let test = {
         </div>
       </div>
     </div>`
-    },
-    "select": {
-      "type": "select",
-      "builder_template": `<div class="row">
+  },
+  "select": {
+    "type": "select",
+    "builder_template": `<div class="row">
       <div class="col component m-1">
         <div class="form-group mt-2 mb-2 p-0">
           <label for="input-select" class="form-label" >
-              <img src="./assets/img/dragdrop.svg" width="16"
+              <img src="assets/img/dragdrop.svg" width="16"
               id="component-select"
               draggable="true" ondragstart="dragElement(event)"
               /> Seçim
@@ -93,23 +93,23 @@ let test = {
         </div>
       </div>
     </div>`
-    }
   }
-  
-  
+}
+
+
 
 renderForm();
 
 function allowDrop(event) {
-    event.preventDefault();
+  event.preventDefault();
 }
 
 function dragElement(event) {
-    holder = event.srcElement.id.replaceAll("component-", "");
+  holder = event.srcElement.id.replaceAll("component-", "");
 }
 
 function addButtonGenerator(id, position) {
-    return `<div class="col d-grid gap-2 add-button add-button-${position}"
+  return `<div class="col d-grid gap-2 add-button add-button-${position}"
     id="button-${id}"
     ondrop="dropElement(event)"
     ondragover="dragOver(event,this.id)"
@@ -120,97 +120,97 @@ function addButtonGenerator(id, position) {
 }
 
 function dropElement(event) {
-    event.preventDefault();
-    document.getElementById("preview-form").classList.remove("bg-secondary");
-    switch (status) {
-        case "first":
-            if (preview_form.length == 1) {
-                preview_form.splice(order + 1, 0, addButtonGenerator(preview_form.length, "last"));
-            } else {
-                preview_form.splice(order + 1, 0, addButtonGenerator(preview_form.length, "middle"));
-            }
+  event.preventDefault();
+  document.getElementById("preview-form").classList.remove("bg-secondary");
+  switch (status) {
+    case "first":
+      if (preview_form.length == 1) {
+        preview_form.splice(order + 1, 0, addButtonGenerator(preview_form.length, "last"));
+      } else {
+        preview_form.splice(order + 1, 0, addButtonGenerator(preview_form.length, "middle"));
+      }
 
-            preview_form.splice(order + 1, 0, form_elements[holder]["preview_template"]);
-            break;
-        case "middle":
-            preview_form.splice(order, 0, form_elements[holder]["preview_template"]);
-            preview_form.splice(order, 0, addButtonGenerator(preview_form.length, "middle"));
-            break;
-        case "last":
-            preview_form.splice(order, 0, form_elements[holder]["preview_template"]);
-            preview_form.splice(order, 0, addButtonGenerator(preview_form.length, "middle"));
+      preview_form.splice(order + 1, 0, form_elements[holder]["preview_template"]);
+      break;
+    case "middle":
+      preview_form.splice(order, 0, form_elements[holder]["preview_template"]);
+      preview_form.splice(order, 0, addButtonGenerator(preview_form.length, "middle"));
+      break;
+    case "last":
+      preview_form.splice(order, 0, form_elements[holder]["preview_template"]);
+      preview_form.splice(order, 0, addButtonGenerator(preview_form.length, "middle"));
 
-            break;
-    }
-    renderForm();
-    holder = "";
-    preview = false;
+      break;
+  }
+  renderForm();
+  holder = "";
+  preview = false;
 }
 
 function dragOver(event, id) {
-    event.preventDefault();
-    if (preview) return;
-    status = document.getElementById(event.target.id).getAttribute("status");
-    order = event.target.id.split("-")[1];
-    document.getElementById(id).innerHTML = form_elements[holder]["preview_template"];
-    document.getElementById(id).classList.remove("add-button");
-    preview = true;
+  event.preventDefault();
+  if (preview) return;
+  status = document.getElementById(event.target.id).getAttribute("status");
+  order = event.target.id.split("-")[1];
+  document.getElementById(id).innerHTML = form_elements[holder]["preview_template"];
+  document.getElementById(id).classList.remove("add-button");
+  preview = true;
 }
 
 function dragLeave(id) {
-    document.getElementById(id).classList.add("add-button");
-    document.getElementById(id).innerHTML = "--EKLE--";
-    renderForm();
-    preview = false;
+  document.getElementById(id).classList.add("add-button");
+  document.getElementById(id).innerHTML = "--EKLE--";
+  renderForm();
+  preview = false;
 }
 
 function renderForm() {
-    let selected_ok = false;
-    for (let i = 0; i < preview_form.length; i++) {
-        let buttonRegex = /button-(\d+)/;
-        let compRegex = /component-edit-(\d+)/;
-        preview_form[i] = preview_form[i].replace(buttonRegex, `button-${i}`);
-        preview_form[i] = preview_form[i].replace(compRegex, `component-edit-${i}`);
-        if (selected == i)
-            selected_ok = true;
-    }
+  let selected_ok = false;
+  for (let i = 0; i < preview_form.length; i++) {
+    let buttonRegex = /button-(\d+)/;
+    let compRegex = /component-edit-(\d+)/;
+    preview_form[i] = preview_form[i].replace(buttonRegex, `button-${i}`);
+    preview_form[i] = preview_form[i].replace(compRegex, `component-edit-${i}`);
+    if (selected == i)
+      selected_ok = true;
+  }
 
-    if (preview_form.length == 1) {
-        preview_form[0] = preview_form[0].replace(" add-button-first", "");
-    } else {
-        preview_form[0] = preview_form[0].replace("add-button", "add-button add-button-first");
-    }
+  if (preview_form.length == 1) {
+    preview_form[0] = preview_form[0].replace(" add-button-first", "");
+  } else {
+    preview_form[0] = preview_form[0].replace("add-button", "add-button add-button-first");
+  }
 
-    document.getElementById("preview-form").innerHTML = preview_form.join("");
+  document.getElementById("preview-form").innerHTML = preview_form.join("");
 
-    if (selected_ok)
-        document.getElementById(`component-edit-${selected}`).classList.add("bg-info");
+  if (selected_ok)
+    document.getElementById(`component-edit-${selected}`).classList.add("bg-info");
 }
 
 function selectComponent(id) {
-    selected = id.split("-")[2];
+  selected = id.split("-")[2];
 
-    renderForm();
+  renderForm();
 }
 
 function get_form_elements(url) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.responseType = 'json';
-    xhr.onload = function () {
-        var status = xhr.status;
-        if (status === 200) {
-            form_elements = xhr.response;
-            render_form_elements();
-        } else {
-            form_elements = false;
-        }
-    };
-    xhr.send();
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.responseType = 'json';
+  xhr.onload = function () {
+    var status = xhr.status;
+    if (status === 200) {
+      form_elements = xhr.response;
+      render_form_elements();
+    } else {
+      form_elements = false;
+    }
+  };
+  xhr.send();
 }
 
 function render_form_elements() {
-    Object.keys(form_elements).forEach(key => {
-        document.getElementById("form_elements").innerHTML = document.getElementById("form_elements").innerHTML + `${form_elements[key]['builder_template']}`
-    });
+  Object.keys(form_elements).forEach(key => {
+    document.getElementById("form_elements").innerHTML = document.getElementById("form_elements").innerHTML + `${form_elements[key]['builder_template']}`
+  });
 }
